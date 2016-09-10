@@ -10,6 +10,9 @@
         /** @var Field\Id table_id **/
         public $table_id;
 
+        /** @var Field\Integer project_id **/
+        public $project_id;
+
         /** @var Field\TextNullable table_name **/
         public $table_name;
 
@@ -36,6 +39,7 @@
             $this->addPrimary(new Field\Id('table_id'));
 
             $this->addFields(
+                new Field\Integer('project_id'),
                 new Field\TextNullable('table_name'),
                 new Field\TextNullable('table_name_singular'),
                 new Field\TextNullable('table_name_plural'),
@@ -45,6 +49,8 @@
                 new Field\TextNullable('table_class_plural')
             );
 
+
+            $this->project_id->references('projects', 'project_id');
         }
 
         /**
@@ -63,5 +69,23 @@
             return self::getBy(
                 $oTable->table_id->setValue($iTableId)
             );
+        }
+
+        /**
+         * @return Project
+         */
+        public function getProject() {
+            if ($this->project_id->hasValue()) {
+                return Project::getById($this->project_id->getValue());
+            }
+        }
+
+        /**
+         * @param Project|null $oProject
+         * @return bool
+         */
+        public function hasProject(Project $oProject = null) {
+            return $oProject instanceof Project
+                && $this->project_id->is($oProject);
         }
     }

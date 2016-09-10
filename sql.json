@@ -1083,6 +1083,118 @@
             },
             "interfaces": "ModifiedDateColumn"
         },
+        "projects": {
+            "table": {
+                "name": "projects",
+                "singular": "project",
+                "title": "Project",
+                "plural": "Projects",
+                "spaced": "projects",
+                "spaced_singular": "project",
+                "spaced_singular_title": "Project",
+                "spaced_title": "Projects",
+                "comment": ""
+            },
+            "count": {
+                "outbound": 0,
+                "inbound": 1,
+                "enum": 0,
+                "primary": 1,
+                "unique": 0,
+                "boolean": 0
+            },
+            "m2m": false,
+            "has_owner": false,
+            "has_date": false,
+            "fields": [
+                {
+                    "short": "id",
+                    "short_title": "Id",
+                    "name": "project_id",
+                    "title": "ProjectId",
+                    "primary": true,
+                    "unique": false,
+                    "boolean": false,
+                    "nullable": false,
+                    "var": "iProjectId",
+                    "default": null,
+                    "comment": "",
+                    "type": "Field\\Id",
+                    "qltype": "id",
+                    "php_type": "int",
+                    "inbound_reference": {
+                        "tables": {
+                            "title": "Table",
+                            "name": "tables",
+                            "table": "tables",
+                            "name_singular": "table",
+                            "name_spaced": "tables",
+                            "name_spaced_singular": "table",
+                            "class": "Table\\Tables",
+                            "subclass": "Tables"
+                        }
+                    },
+                    "short_pad": "  ",
+                    "name_pad": "  "
+                },
+                {
+                    "short": "name",
+                    "short_title": "Name",
+                    "name": "project_name",
+                    "title": "ProjectName",
+                    "primary": false,
+                    "unique": false,
+                    "boolean": false,
+                    "nullable": true,
+                    "var": "sProjectName",
+                    "default": null,
+                    "comment": "",
+                    "type": "Field\\TextNullable",
+                    "qltype": "string",
+                    "php_type": "string",
+                    "short_pad": "",
+                    "name_pad": ""
+                }
+            ],
+            "types": [
+                "Id",
+                "TextNullable"
+            ],
+            "primary": [
+                {
+                    "short": "id",
+                    "short_title": "Id",
+                    "name": "project_id",
+                    "title": "ProjectId",
+                    "primary": true,
+                    "unique": false,
+                    "boolean": false,
+                    "nullable": false,
+                    "var": "iProjectId",
+                    "default": null,
+                    "comment": "",
+                    "type": "Field\\Id",
+                    "qltype": "id",
+                    "php_type": "int",
+                    "inbound_reference": {
+                        "tables": {
+                            "title": "Table",
+                            "name": "tables",
+                            "table": "tables",
+                            "name_singular": "table",
+                            "name_spaced": "tables",
+                            "name_spaced_singular": "table",
+                            "class": "Table\\Tables",
+                            "subclass": "Tables"
+                        }
+                    }
+                }
+            ],
+            "unique": [],
+            "date_added": false,
+            "date_updated": false,
+            "interfaces": ""
+        },
         "tables": {
             "table": {
                 "name": "tables",
@@ -1096,7 +1208,7 @@
                 "comment": ""
             },
             "count": {
-                "outbound": 0,
+                "outbound": 1,
                 "inbound": 2,
                 "enum": 0,
                 "primary": 1,
@@ -1146,6 +1258,37 @@
                     },
                     "short_pad": "              ",
                     "name_pad": "              "
+                },
+                {
+                    "short": "project_id",
+                    "short_title": "Project_id",
+                    "name": "project_id",
+                    "title": "ProjectId",
+                    "primary": false,
+                    "unique": false,
+                    "boolean": false,
+                    "nullable": true,
+                    "var": "iProjectId",
+                    "default": null,
+                    "comment": "",
+                    "type": "Field\\Integer",
+                    "qltype": "int",
+                    "php_type": "int",
+                    "reference": {
+                        "title": "Project",
+                        "title_plural": "Projects",
+                        "field": "project_id",
+                        "name": "projects",
+                        "name_singular": "project",
+                        "name_spaced": "projects",
+                        "name_spaced_singular": "project",
+                        "class": "Table\\Project",
+                        "class_plural": "Table\\Projects",
+                        "subclass": "Project",
+                        "subclass_plural": "Projects"
+                    },
+                    "short_pad": "      ",
+                    "name_pad": "            "
                 },
                 {
                     "short": "name",
@@ -1276,6 +1419,7 @@
             ],
             "types": [
                 "Id",
+                "Integer",
                 "TextNullable"
             ],
             "primary": [

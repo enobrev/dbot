@@ -3,6 +3,7 @@
         "column_types": "ColumnType",
         "columns": "Column",
         "notes": "Note",
+        "projects": "Project",
         "tables": "Table"
     },
     "column_types": {
@@ -48,8 +49,13 @@
         "date_added"  : "note_date_added",
         "date_updated": "note_date_updated"
     },
+    "projects": {
+        "id"  : "project_id",
+        "name": "project_name"
+    },
     "tables": {
         "id"              : "table_id",
+        "project_id"      : "project_id",
         "name"            : "table_name",
         "name_singular"   : "table_name_singular",
         "name_plural"     : "table_name_plural",
