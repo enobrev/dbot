@@ -1,6 +1,7 @@
 
 /.idea/
 /vendor/
+jspm/
 dbot.enobrev.net.iml
 .config.local.php
 .well-known
