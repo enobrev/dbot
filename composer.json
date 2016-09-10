@@ -1,0 +1,30 @@
+{
+    "name": "enobrev/dbot",
+    "description": "Database Sketching Tool",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mark Armendariz",
+            "email": "src@enobrev.com"
+        }
+    ],
+    "require": {
+        "enobrev/orm": "dev-master",
+        "enobrev/tools": "dev-master",
+        "enobrev/api": "dev-master"
+    },
+    "repositories": {
+        "orm": {
+            "type": "vcs",
+            "url": "https://github.com/enobrev/orm"
+        },
+        "api": {
+            "type": "vcs",
+            "url": "https://github.com/enobrev/api"
+        },
+        "tools": {
+            "type": "vcs",
+            "url": "https://github.com/enobrev/tools"
+        }
+    }
+}

@@ -1,0 +1,61 @@
+{
+    "_CLASSES_": {
+        "column_types": "ColumnType",
+        "columns": "Column",
+        "notes": "Note",
+        "tables": "Table"
+    },
+    "column_types": {
+        "id"            : "column_type_id",
+        "name"          : "column_type_name",
+        "mysql"         : "column_type_mysql",
+        "php"           : "column_type_php",
+        "javascript"    : "column_type_javascript",
+        "unsigned"      : "column_type_unsigned",
+        "null"          : "column_type_null",
+        "primary"       : "column_type_primary",
+        "auto_increment": "column_type_auto_increment",
+        "length"        : "column_type_length"
+    },
+    "columns": {
+        "id"              : "column_id",
+        "table_id"        : "table_id",
+        "reference_id"    : "reference_column_id",
+        "reference_delete": "reference_delete",
+        "reference_update": "reference_update",
+        "name"            : "column_name",
+        "name_singular"   : "column_name_singular",
+        "name_plural"     : "column_name_plural",
+        "name_short"      : "column_name_short",
+        "display_singular": "column_display_singular",
+        "display_plural"  : "column_display_plural",
+        "type_id"         : "column_type_id",
+        "length"          : "column_length",
+        "values"          : "column_values",
+        "default"         : "column_default",
+        "null"            : "column_null",
+        "primary"         : "column_primary",
+        "unique"          : "column_unique",
+        "auto_increment"  : "column_auto_increment",
+        "date_added"      : "column_date_added",
+        "date_updated"    : "column_date_updated"
+    },
+    "notes": {
+        "id"          : "note_id",
+        "table_id"    : "table_id",
+        "column_id"   : "column_id",
+        "text"        : "note_text",
+        "date_added"  : "note_date_added",
+        "date_updated": "note_date_updated"
+    },
+    "tables": {
+        "id"              : "table_id",
+        "name"            : "table_name",
+        "name_singular"   : "table_name_singular",
+        "name_plural"     : "table_name_plural",
+        "display_singular": "table_display_singular",
+        "display_plural"  : "table_display_plural",
+        "class_singular"  : "table_class_singular",
+        "class_plural"    : "table_class_plural"
+    }
+}
