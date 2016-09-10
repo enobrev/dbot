@@ -65,7 +65,7 @@ export default class Project extends BaobabComponent {
 
             case 8: // BACKSPACE
                 if (sName.length == 0) {
-                    this.oCursors.table.unset();
+                    this.oCursors.name.up().unset();
 
                     console.log('TODO: Focus on Previous Table or Project');
                 }

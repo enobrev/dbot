@@ -2,6 +2,7 @@
 
 import React, { PropTypes } from "react";
 import BaobabComponent from './BaobabComponent';
+import Data from '../js/Data';
 import LocalData from '../js/LocalData';
 
 export default class Column extends BaobabComponent {
@@ -17,7 +18,17 @@ export default class Column extends BaobabComponent {
             name:    [ 'local', 'columns', this.props.id, 'name' ],
             tables:   {
                 path:    ['local', 'tables'],
+                passive: true,
                 adjust:  oState => oState.table = oState.tables[oState.column.table_id]
+            },
+            columns: {
+                path: [ 'local', 'columns' ],
+                passive: true,
+                adjust: oState => {
+                    oState.table_columns = Object.values(oState.columns).filter(oColumn => oColumn.table_id == oState.column.table_id);
+                    oState.column_index  = oState.table_columns.findIndex(oColumn => oColumn.id == oState.column.id);
+
+                }
             }
         }
     }
@@ -45,7 +56,7 @@ export default class Column extends BaobabComponent {
     };
 
     keyUp = oEvent => {
-        const { name: sName, table: oTable } = this.state;
+        const { name: sName, table: oTable, table_columns: aColumns, column_index: iIndex } = this.state;
 
         switch(oEvent.keyCode) {
             case 13: // ENTER
@@ -64,7 +75,16 @@ export default class Column extends BaobabComponent {
                 if (sName.length == 0) {
                     this.oCursors.column.unset();
 
-                    console.log('TODO: Focus on Previous Column');
+                    // Remember that aColumns is outdated at this point because that "unset" has not taken yet
+                    if (aColumns.length > 1) {
+                        if (iIndex < aColumns.length - 1) {
+                            console.log('TODO: Focus on Next Column', aColumns[ iIndex + 1 ]);
+                        } else {
+                            console.log('TODO: Focus on Previous Column', aColumns[ iIndex - 1 ]);
+                        }
+                    } else {
+                        console.log('TODO: Focus on Table', oTable);
+                    }
                 }
                 break;
 

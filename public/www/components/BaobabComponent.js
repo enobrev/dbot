@@ -124,8 +124,11 @@ export default class BaobabComponent extends React.Component {
 
         for (let sKey in oState) {
             if (oState[sKey] != this.oData[sKey]) { // HAS TO BE != instead of !==.  See Baobab::helpers::solveUpdate
+                let bPassed = false;
+
                 if (this._iPassive && this._oPassive[sKey] !== undefined) {
                     // Do noy announce the changes of passive cursors
+                    bPassed  = true;
                 } else {
                     bChanged = true;
                     //aChanged.push(sKey);
@@ -135,7 +138,7 @@ export default class BaobabComponent extends React.Component {
                     this._oAdjusted[sKey].adjust(oState);
 
                     // Passive Cursor, but we have a change to report
-                    if (this._iPassive && this._oPassive[sKey] !== undefined) {
+                    if (bPassed) {
                         bChanged = true;
                         //aChanged.push(sKey);
                     }
