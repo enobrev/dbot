@@ -11,13 +11,13 @@
 
         protected $sTitle = 'notes';
 
-        /** @var Field\Id note_id **/
+        /** @var Field\UUID note_id **/
         public $note_id;
 
-        /** @var Field\Integer table_id **/
+        /** @var Field\UUIDNullable table_id **/
         public $table_id;
 
-        /** @var Field\Integer column_id **/
+        /** @var Field\UUIDNullable column_id **/
         public $column_id;
 
         /** @var Field\TextNullable note_text **/
@@ -31,11 +31,11 @@
 
 
         protected function init() {
-            $this->addPrimary(new Field\Id('note_id'));
+            $this->addPrimary(new Field\UUID('note_id'));
 
             $this->addFields(
-                new Field\Integer('table_id'),
-                new Field\Integer('column_id'),
+                new Field\UUIDNullable('table_id'),
+                new Field\UUIDNullable('column_id'),
                 new Field\TextNullable('note_text'),
                 new Field\DateTime('note_date_added'),
                 new Field\DateTime('note_date_updated')
@@ -54,13 +54,13 @@
         }
 
         /**
-         * @param int $iNoteId
+         * @param string $sNoteId
          * @return Note
          */
-        public static function getById($iNoteId) {
+        public static function getById($sNoteId) {
             $oTable = new self;
             return self::getBy(
-                $oTable->note_id->setValue($iNoteId)
+                $oTable->note_id->setValue($sNoteId)
             );
         }
 
@@ -101,11 +101,17 @@
         }
 
         public function preInsert() {
+            if ($this->note_id->isNull()) {
+                $this->note_id->generateValue();
+            }
             $this->note_date_added->setValue($this->now());
             $this->note_date_updated->setValue($this->now());
         }
 
         public function preUpsert() {
+            if ($this->note_id->isNull()) {
+                $this->note_id->generateValue();
+            }
             $this->note_date_added->setValue($this->now());
             $this->note_date_updated->setValue($this->now());
         }

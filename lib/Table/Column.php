@@ -21,13 +21,13 @@
         const UPDATE_NO_ACTION = 'NO ACTION';
         const UPDATE_RESTRICT  = 'RESTRICT';
 
-        /** @var Field\Id column_id **/
+        /** @var Field\UUID column_id **/
         public $column_id;
 
-        /** @var Field\Integer table_id **/
+        /** @var Field\UUIDNullable table_id **/
         public $table_id;
 
-        /** @var Field\Integer reference_column_id **/
+        /** @var Field\UUIDNullable reference_column_id **/
         public $reference_column_id;
 
         /** @var Field\Enum reference_delete **/
@@ -36,25 +36,25 @@
         /** @var Field\Enum reference_update **/
         public $reference_update;
 
-        /** @var Field\TextNullable column_name **/
+        /** @var Field\Text column_name **/
         public $column_name;
 
-        /** @var Field\TextNullable column_name_singular **/
+        /** @var Field\Text column_name_singular **/
         public $column_name_singular;
 
-        /** @var Field\TextNullable column_name_plural **/
+        /** @var Field\Text column_name_plural **/
         public $column_name_plural;
 
-        /** @var Field\TextNullable column_name_short **/
+        /** @var Field\Text column_name_short **/
         public $column_name_short;
 
-        /** @var Field\TextNullable column_display_singular **/
+        /** @var Field\Text column_display_singular **/
         public $column_display_singular;
 
-        /** @var Field\TextNullable column_display_plural **/
+        /** @var Field\Text column_display_plural **/
         public $column_display_plural;
 
-        /** @var Field\Integer column_type_id **/
+        /** @var Field\UUIDNullable column_type_id **/
         public $column_type_id;
 
         /** @var Field\Integer column_length **/
@@ -86,20 +86,20 @@
 
 
         protected function init() {
-            $this->addPrimary(new Field\Id('column_id'));
+            $this->addPrimary(new Field\UUID('column_id'));
 
             $this->addFields(
-                new Field\Integer('table_id'),
-                new Field\Integer('reference_column_id'),
+                new Field\UUIDNullable('table_id'),
+                new Field\UUIDNullable('reference_column_id'),
                 new Field\Enum('reference_delete', [self::DELETE_CASCADE, self::DELETE_SET_NULL, self::DELETE_NO_ACTION, self::DELETE_RESTRICT]),
                 new Field\Enum('reference_update', [self::UPDATE_CASCADE, self::UPDATE_SET_NULL, self::UPDATE_NO_ACTION, self::UPDATE_RESTRICT]),
-                new Field\TextNullable('column_name'),
-                new Field\TextNullable('column_name_singular'),
-                new Field\TextNullable('column_name_plural'),
-                new Field\TextNullable('column_name_short'),
-                new Field\TextNullable('column_display_singular'),
-                new Field\TextNullable('column_display_plural'),
-                new Field\Integer('column_type_id'),
+                new Field\Text('column_name'),
+                new Field\Text('column_name_singular'),
+                new Field\Text('column_name_plural'),
+                new Field\Text('column_name_short'),
+                new Field\Text('column_display_singular'),
+                new Field\Text('column_display_plural'),
+                new Field\UUIDNullable('column_type_id'),
                 new Field\Integer('column_length'),
                 new Field\TextNullable('column_values'),
                 new Field\TextNullable('column_default'),
@@ -127,13 +127,13 @@
         }
 
         /**
-         * @param int $iColumnId
+         * @param string $sColumnId
          * @return Column
          */
-        public static function getById($iColumnId) {
+        public static function getById($sColumnId) {
             $oTable = new self;
             return self::getBy(
-                $oTable->column_id->setValue($iColumnId)
+                $oTable->column_id->setValue($sColumnId)
             );
         }
 
@@ -220,11 +220,17 @@
         }
 
         public function preInsert() {
+            if ($this->column_id->isNull()) {
+                $this->column_id->generateValue();
+            }
             $this->column_date_added->setValue($this->now());
             $this->column_date_updated->setValue($this->now());
         }
 
         public function preUpsert() {
+            if ($this->column_id->isNull()) {
+                $this->column_id->generateValue();
+            }
             $this->column_date_added->setValue($this->now());
             $this->column_date_updated->setValue($this->now());
         }

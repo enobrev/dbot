@@ -7,7 +7,7 @@
     class Project extends ORM\Table {
         protected $sTitle = 'projects';
 
-        /** @var Field\Id project_id **/
+        /** @var Field\UUID project_id **/
         public $project_id;
 
         /** @var Field\TextNullable project_name **/
@@ -15,7 +15,7 @@
 
 
         protected function init() {
-            $this->addPrimary(new Field\Id('project_id'));
+            $this->addPrimary(new Field\UUID('project_id'));
 
             $this->addFields(
                 new Field\TextNullable('project_name')
@@ -31,13 +31,13 @@
         }
 
         /**
-         * @param int $iProjectId
+         * @param string $sProjectId
          * @return Project
          */
-        public static function getById($iProjectId) {
+        public static function getById($sProjectId) {
             $oTable = new self;
             return self::getBy(
-                $oTable->project_id->setValue($iProjectId)
+                $oTable->project_id->setValue($sProjectId)
             );
         }
     }

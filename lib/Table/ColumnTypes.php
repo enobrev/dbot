@@ -2,10 +2,10 @@
     namespace DBot\Table;
 
     use Enobrev\ORM\Db;
-    use Enobrev\ORM\Tables;
+    use Enobrev\ORM;
     use Enobrev\SQLBuilder;
 
-    class ColumnTypes extends Tables {
+    class ColumnTypes extends ORM\Tables {
         /**
          * @return ColumnType
          */

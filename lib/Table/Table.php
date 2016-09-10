@@ -7,10 +7,10 @@
     class Table extends ORM\Table {
         protected $sTitle = 'tables';
 
-        /** @var Field\Id table_id **/
+        /** @var Field\UUID table_id **/
         public $table_id;
 
-        /** @var Field\Integer project_id **/
+        /** @var Field\UUIDNullable project_id **/
         public $project_id;
 
         /** @var Field\TextNullable table_name **/
@@ -36,10 +36,10 @@
 
 
         protected function init() {
-            $this->addPrimary(new Field\Id('table_id'));
+            $this->addPrimary(new Field\UUID('table_id'));
 
             $this->addFields(
-                new Field\Integer('project_id'),
+                new Field\UUIDNullable('project_id'),
                 new Field\TextNullable('table_name'),
                 new Field\TextNullable('table_name_singular'),
                 new Field\TextNullable('table_name_plural'),
@@ -61,13 +61,13 @@
         }
 
         /**
-         * @param int $iTableId
+         * @param string $sTableId
          * @return Table
          */
-        public static function getById($iTableId) {
+        public static function getById($sTableId) {
             $oTable = new self;
             return self::getBy(
-                $oTable->table_id->setValue($iTableId)
+                $oTable->table_id->setValue($sTableId)
             );
         }
 

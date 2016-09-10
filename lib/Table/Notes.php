@@ -4,10 +4,10 @@
     use DateTime;
 
     use Enobrev\ORM\Db;
-    use Enobrev\ORM\Tables;
+    use Enobrev\ORM;
     use Enobrev\SQLBuilder;
 
-    class Notes extends Tables {
+    class Notes extends ORM\Tables {
         /**
          * @return Note
          */

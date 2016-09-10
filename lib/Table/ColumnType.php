@@ -7,7 +7,7 @@
     class ColumnType extends ORM\Table {
         protected $sTitle = 'column_types';
 
-        /** @var Field\Id column_type_id **/
+        /** @var Field\UUID column_type_id **/
         public $column_type_id;
 
         /** @var Field\TextNullable column_type_name **/
@@ -39,7 +39,7 @@
 
 
         protected function init() {
-            $this->addPrimary(new Field\Id('column_type_id'));
+            $this->addPrimary(new Field\UUID('column_type_id'));
 
             $this->addFields(
                 new Field\TextNullable('column_type_name'),
@@ -63,13 +63,13 @@
         }
 
         /**
-         * @param int $iColumnTypeId
+         * @param string $sColumnTypeId
          * @return ColumnType
          */
-        public static function getById($iColumnTypeId) {
+        public static function getById($sColumnTypeId) {
             $oTable = new self;
             return self::getBy(
-                $oTable->column_type_id->setValue($iColumnTypeId)
+                $oTable->column_type_id->setValue($sColumnTypeId)
             );
         }
 

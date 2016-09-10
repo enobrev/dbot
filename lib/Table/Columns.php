@@ -4,10 +4,10 @@
     use DateTime;
 
     use Enobrev\ORM\Db;
-    use Enobrev\ORM\Tables;
+    use Enobrev\ORM;
     use Enobrev\SQLBuilder;
 
-    class Columns extends Tables {
+    class Columns extends ORM\Tables {
         /**
          * @return Column
          */
