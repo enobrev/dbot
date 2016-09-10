@@ -14,6 +14,10 @@ export default class Column extends BaobabComponent {
 
     stateQueries() {
         return {
+            columns: {
+                path:    [ 'local', 'columns' ],
+                passive: true
+            },
             column:  [ 'local', 'columns', this.props.id ]
         }
     }
@@ -55,9 +59,9 @@ export default class Column extends BaobabComponent {
                         name:       ''
                     };
 
-                    Data.Base.select('local', 'columns').set(oColumn.id, oColumn);
+                    this.oCursors.columns.set(oColumn.id, oColumn);
                 } else {
-                    Data.Base.select('local', 'columns').unset(this.props.id);
+                    this.oCursors.columns.unset(this.props.id);
 
                     console.log('Delete Column, Add Table');
                 }
@@ -65,7 +69,7 @@ export default class Column extends BaobabComponent {
 
             case 8: // BACKSPACE
                 if (oCurrentColumn.name.length == 0) {
-                    Data.Base.select('local', 'columns').unset(this.props.id);
+                    this.oCursors.columns.unset(this.props.id);
 
                     console.log('TODO: Focus on Previous Column');
                 }

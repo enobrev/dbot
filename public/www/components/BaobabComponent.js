@@ -181,9 +181,6 @@ export default class BaobabComponent extends React.Component {
             let bIsPath   = Array.isArray(mQuery);
             let sPath     = bIsPath ? mQuery : mQuery.path;
 
-            this._oPaths[sKey]  = sPath;
-            this.oCursors[sKey] = Data.Base.select(sPath);
-
             if (!bIsPath) {
                 if (typeof mQuery.adjust == 'function') {
                     this._oAdjusted[ sKey ] = mQuery;
@@ -194,7 +191,19 @@ export default class BaobabComponent extends React.Component {
                     this._oAfter[ sKey ] = mQuery;
                     this._iAfter++;
                 }
+
+                // Only Watch Passive Paths
+                if (mQuery.passive === undefined && !mQuery.passive) {
+                    this._oPaths[sKey]  = sPath;
+                }
+
+                // Always add cursors
+                this.oCursors[sKey] = Data.Base.select(sPath);
+            } else {
+                this._oPaths[sKey]  = sPath;
+                this.oCursors[sKey] = Data.Base.select(sPath);
             }
+
         });
 
         this._aPaths  = Object.values(this._oPaths);
