@@ -23,6 +23,8 @@ export default class Column extends BaobabComponent {
             column: oColumn
         } = this.state;
 
+        console.log('Column.render');
+
         return (
             <form className="ui form" onSubmit={oEvent => oEvent.preventDefault()}>
                 <div className="field">

@@ -26,6 +26,7 @@ System.config({
     "css": "github:systemjs/plugin-css@0.1.27",
     "localforage": "npm:localforage@1.4.2",
     "react": "npm:react@15.3.1",
+    "react-addons-shallow-compare": "npm:react-addons-shallow-compare@15.3.1",
     "react-dom": "npm:react-dom@15.3.1",
     "semantic-ui": "github:Semantic-Org/Semantic-UI@2.2.4",
     "whatwg-fetch": "npm:whatwg-fetch@1.0.0",
@@ -539,6 +540,9 @@ System.config({
       "buffer": "github:jspm/nodelibs-buffer@0.1.0",
       "crypto": "github:jspm/nodelibs-crypto@0.1.0",
       "process": "github:jspm/nodelibs-process@0.1.2"
+    },
+    "npm:react-addons-shallow-compare@15.3.1": {
+      "react": "npm:react@15.3.1"
     },
     "npm:react-dom@15.3.1": {
       "react": "npm:react@15.3.1"

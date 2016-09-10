@@ -2,6 +2,8 @@
 
 import React, {PropTypes} from "react";
 import Data from '../js/Data';
+import UUID from '../js/UUID';
+import shallowCompare from 'react-addons-shallow-compare'
 
 /**
  * Components should extend this component.  The extending components should override the stateQueries method.
@@ -104,7 +106,7 @@ export default class BaobabComponent extends React.Component {
     }
 
     _treeUpdate = oEvent => {
-        let aChangedPath = solveUpdate(oEvent.data.paths, this._aPaths)
+        let aChangedPath = solveUpdate(oEvent.data.paths, this._aPaths);
         if (aChangedPath !== false) {
             this.onWatcherData(oEvent);
         }
@@ -117,8 +119,8 @@ export default class BaobabComponent extends React.Component {
 
         let oState   = this._getData();
         let oAfter   = {};
-        //let aChanged = [];
         let bChanged = false;
+        //let aChanged = [];
 
         for (let sKey in oState) {
             if (oState[sKey] != this.oData[sKey]) { // HAS TO BE != instead of !==.  See Baobab::helpers::solveUpdate
@@ -136,7 +138,7 @@ export default class BaobabComponent extends React.Component {
         }
 
         if (bChanged) {
-            // console.log('CHANGED:', aChanged, oState);
+            //console.log('CHANGED', this.constructor.name, aChanged, oEvent);
 
             let fDone  = () => Object.keys(oAfter).map(sKey => oAfter[sKey].after(oState));
             this.oData = oState;
@@ -152,17 +154,14 @@ export default class BaobabComponent extends React.Component {
 
     componentWillMount() {
         this.bWatch = true;
-        // TODO: Attach Watchers
     }
 
     componentWillUnmount() {
         this.bWatch = false;
-        // TODO: Release Watchers
     }
 
     shouldComponentUpdate(oNextProps, oNextState) {
-        return !Object.is(oNextProps, this.props)
-            || !Object.is(oNextState, this.state);
+        return shallowCompare(this, oNextProps, oNextState);
     }
 
     onBoundInputChange = oEvent => {

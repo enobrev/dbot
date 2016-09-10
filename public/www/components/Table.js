@@ -14,44 +14,35 @@ export default class Table extends BaobabComponent {
 
     stateQueries() {
         return {
-            table:   [ 'local', 'tables', this.props.id ],
+            name:   [ 'local', 'tables', this.props.id, 'name' ],
             columns: {
                 path:   [ 'local', 'columns' ],
-                adjust: oState => oState.columns = Object.values(oState.columns).filter(oTable => oTable.table_id == this.props.id)
+                adjust: oState => {
+                    oState.table_columns = Object.values(oState.columns).filter(oTable => oTable.table_id == this.props.id);
+                    oState.show    = oState.table_columns.length > 0;
+                }
             }
         }
     }
 
     render() {
         const {
-            table:         oTable
+            name:    sName,
+            table_columns: aColumns,
+            show:    bShow
         } = this.state;
 
         return (
             <div className="ui segment">
                 <form className="ui form" onSubmit={oEvent => oEvent.preventDefault()}>
                     <div className="field">
-                        <input type="text" ref="input" name="name" value={oTable.name} placeholder="Table Name" onChange={this.updateName} onKeyUp={this.keyUp} />
+                        <input type="text" ref="input" name="name" value={sName} placeholder="Table Name" onChange={this.updateName} onKeyUp={this.keyUp} />
                     </div>
                 </form>
 
-                {this.renderColumns()}
-            </div>
-        )
-    }
-
-    renderColumns() {
-        const {
-            columns: aColumns
-        } = this.state;
-
-        if (aColumns.length == 0) {
-            return null;
-        }
-
-        return (
-            <div className="ui basic segment">
-                {aColumns.map(oTable => <Column key={oTable.id} id={oTable.id} />)}
+                <div className="ui basic segment" style={{display: bShow ? 'block' : 'none'}}>
+                    {aColumns.map(oTable => <Column key={oTable.id} id={oTable.id} />)}
+                </div>
             </div>
         )
     }
@@ -61,13 +52,12 @@ export default class Table extends BaobabComponent {
     }
 
     updateName = oEvent => {
-        this.oCursors.table.select(oEvent.target.name).set(oEvent.target.value);
+        this.oCursors.name.set(oEvent.target.value);
     };
 
     keyUp = oEvent => {
         const {
-            table:         oTable,
-            columns: aColumns
+            table_columns: aColumns
         } = this.state;
 
         if (oEvent.keyCode == 13) { // isEnter
@@ -78,7 +68,7 @@ export default class Table extends BaobabComponent {
                 console.log('create column');
                 let oColumn = {
                     id:         UUID(),
-                    table_id:   oTable.id,
+                    table_id:   this.props.id,
                     name:       ''
                 };
 

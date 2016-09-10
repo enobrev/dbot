@@ -33,7 +33,8 @@ export default class Data {
                 url_state: {},
                 component: null
             }
-        }
+        },
+        props: {}
     });
 
     static has(aPath) {

@@ -18,13 +18,13 @@ export default class App extends BaobabComponent {
         return {
             projects: {
                 path:   [ 'local', 'projects' ],
-                adjust: oState => oState.projects = Object.values(oState.projects)
+                adjust: oState => oState.projects_array = Object.values(oState.projects)
             }
         }
     }
 
     render() {
-        const { projects: aProjects } = this.state;
+        const { projects_array: aProjects } = this.state;
 
         return (
             <div className="ui stackable celled grid container">
@@ -50,7 +50,7 @@ export default class App extends BaobabComponent {
     componentWillMount() {
         super.componentWillMount();
 
-        API.query(['columns', 'column_types', 'notes', 'projects', 'tables'], (oError, oResponse) => Data.mergeResponse(oResponse));
+        API.query(['columns', 'column_types', 'notes', 'projects_array', 'tables'], (oError, oResponse) => Data.mergeResponse(oResponse));
     }
 
     addProject = () => {
