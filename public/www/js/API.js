@@ -1,6 +1,7 @@
 "use strict";
 
-import {default as request} from 'superagent';
+import 'whatwg-fetch';
+import HttpError from './HttpError';
 
 export default class API {
     static _token = null;
@@ -18,7 +19,7 @@ export default class API {
         this._base_url = sUrl;
     }
 
-    static getUrl(sEndpoint) {
+    static _getUrl(sEndpoint) {
         if (!this._base_url) {
             throw new Error('API_BASE_URL has not been defined');
         }
@@ -32,8 +33,7 @@ export default class API {
         return this._base_url + sEndpoint;
     }
 
-    static _getHeaders () {
-        let oHeaders = {};
+    static _getHeaders (oHeaders = {}) {
         if (this._token) {
             oHeaders['Authorization'] = 'Bearer: ' + this._token;
         }
@@ -41,48 +41,82 @@ export default class API {
         return oHeaders;
     }
 
-    static query (endpoints, fCallback) {
-        request
-            .post(this.getUrl())
-            .type('json')
-            .set(this._getHeaders())
-            .send(JSON.stringify({
-                __query: endpoints
-            }))
-            .end((oError, oResponse) => this._respond(fCallback, oError, oResponse));
-    }
-
     static get (sEndpoint, fCallback) {
-        request
-            .get(this.getUrl(sEndpoint))
-            .set(this._getHeaders())
-            .end((oError, oResponse) => this._respond(fCallback, oError, oResponse));
+        fetch(this._getUrl(sEndpoint), {
+            method: 'GET',
+            mode: 'cors',
+            headers: this._getHeaders({
+                'Accept':       'application/json'
+            })
+        })
+            .then(oResponse => { this._respond(oResponse, fCallback); })
+            .catch(fCallback);
     }
 
     static put (sEndpoint, oData, fCallback) {
-        request
-            .put(this.getUrl(sEndpoint))
-            .type('form')
-            .set(this._getHeaders())
-            .send(oData)
-            .end((oError, oResponse) => this._respond(fCallback, oError, oResponse));
+        fetch(this._getUrl(sEndpoint), {
+            method: 'PUT',
+            mode: 'cors',
+            headers: this._getHeaders({
+                'Accept':       'application/json',
+                'Content-Type': 'application/json'
+            }),
+            body: JSON.stringify(oData)
+        })
+            .then(oResponse => { this._respond(oResponse, fCallback); })
+            .catch(fCallback);
     }
 
     static del (sEndpoint, fCallback) {
-        request
-            .delete(this.getUrl(sEndpoint))
-            .type('form')
-            .set(this._getHeaders())
-            .end((oError, oResponse) => this._respond(fCallback, oError, oResponse));
+        fetch(this._getUrl(sEndpoint), {
+            method: 'DELETE',
+            mode: 'cors',
+            headers: this._getHeaders({
+                'Accept':       'application/json'
+            }),
+        })
+            .then(oResponse => { this._respond(oResponse, fCallback); })
+            .catch(fCallback);
     }
 
     static post (sEndpoint, oData, fCallback) {
-        request
-            .post(this.getUrl(sEndpoint))
-            .type('form')
-            .set(this._getHeaders())
-            .send(oData)
-            .end((oError, oResponse) => this._respond(fCallback, oError, oResponse));
+        fetch(this._getUrl(sEndpoint), {
+            method: 'POST',
+            mode: 'cors',
+            headers: this._getHeaders({
+                'Accept':       'application/json',
+                'Content-Type': 'application/json'
+            }),
+            body: JSON.stringify(oData)
+        })
+            .then(oResponse => { this._respond(oResponse, fCallback); })
+            .catch(fCallback);
+    }
+
+    static upload (sEndpoint, oData, aFiles, fCallback) {
+        let bAlright = aFiles.every(oFile => oFile.field !== undefined);
+
+        if (!bAlright) {
+            return fCallback(new Error('field property must be specified for uploaded files'));
+        }
+
+        let oFormData = new FormData;
+
+        Object.keys(oData).map( sKey  => oFormData.append(sKey,        oData[sKey]            ));
+        aFiles.map(             oFile => oFormData.append(oFile.field, oFile,      oFile.name ));
+
+        fetch(this._getUrl(sEndpoint), {
+            method:  'POST',
+            mode: 'cors',
+            headers: this._getHeaders(),
+            body:    oFormData
+        })
+            .then(oResponse => { this._respond(oResponse, fCallback); })
+            .catch(fCallback);
+    }
+
+    static query (endpoints, fCallback) {
+        API.post('/', { __query: endpoints }, fCallback);
     }
 
     static log(sMessage, oContext) {
@@ -92,43 +126,30 @@ export default class API {
             context: sContext
         };
 
-        request
-            .post(this.getUrl('/log'))
-            .type('form')
-            .set(this._getHeaders())
-            .send(oData)
-            .end(oError => {
-                if (oError) {
-                    console.error('log sent with error', sMessage, sContext, oError);
-                } else {
-                    console.log('log sent', sMessage, sContext);
-                }
-            });
-    }
-
-    static upload (sEndpoint, oData, aFiles, fCallback) {
-        for (let i in aFiles) {
-            if (aFiles[i].field === undefined) {
-                return fCallback(new Error('field property must be specified for uploaded files'));
+        API.post('/log', oData, oError => {
+            if (oError) {
+                console.error('log sent with error', sMessage, sContext, oError);
+            } else {
+                console.log('log sent', sMessage, sContext);
             }
-        }
-
-        let oRequest = request
-            .post(this.getUrl(sEndpoint))
-            .set(this._getHeaders());
-
-        Object.keys(oData).forEach(sKey => oRequest.field(sKey, oData[sKey]));
-
-        aFiles.forEach(oFile => oRequest.attach(oFile.field, oFile, oFile.name));
-
-        oRequest.end((oError, oResponse) => this._respond(fCallback, oError, oResponse));
+        });
     }
 
-    static _respond(fCallback, oError, oResponse) {
-        if (oError) {
-            return fCallback(oError);
+    /**
+     *
+     * @param {Response} oResponse
+     * @param {function} fCallback
+     * @private
+     */
+    static _respond(oResponse, fCallback) {
+        if (oResponse.ok) {
+            if (oResponse.status == 204) {
+                fCallback();
+            } else {
+                oResponse.json().then(oData => fCallback(null, oData));
+            }
+        } else {
+            fCallback(new HttpError(oResponse.statusText, oResponse.status), oResponse);
         }
-
-        fCallback(oError, oResponse.body, oResponse.text)
     }
 }

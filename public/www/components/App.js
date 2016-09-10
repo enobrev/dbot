@@ -10,6 +10,8 @@ import Data from '../js/Data';
 import 'semantic-ui/semantic.js';
 import 'semantic-ui/semantic.css!';
 
+import '../js/API.test.js';
+
 export default class App extends BaobabComponent {
     stateQueries() {
         return {
@@ -32,4 +34,4 @@ export default class App extends BaobabComponent {
     }
 }
 
-ReactDOM.render(<App />, document.body);
+ReactDOM.render(<App />, document.getElementById('root'));
