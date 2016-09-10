@@ -14,12 +14,13 @@ export default class Table extends BaobabComponent {
 
     stateQueries() {
         return {
+            table:  [ 'local', 'tables', this.props.id ],
             name:   [ 'local', 'tables', this.props.id, 'name' ],
             columns: {
                 path:   [ 'local', 'columns' ],
                 adjust: oState => {
                     oState.table_columns = Object.values(oState.columns).filter(oTable => oTable.table_id == this.props.id);
-                    oState.show    = oState.table_columns.length > 0;
+                    oState.show          = oState.table_columns.length > 0;
                 }
             }
         }
@@ -27,9 +28,9 @@ export default class Table extends BaobabComponent {
 
     render() {
         const {
-            name:    sName,
+            name:          sName,
             table_columns: aColumns,
-            show:    bShow
+            show:          bShow
         } = this.state;
 
         return (
@@ -57,23 +58,35 @@ export default class Table extends BaobabComponent {
 
     keyUp = oEvent => {
         const {
-            table_columns: aColumns
+            table_columns: aColumns,
+            table:         oTable,
+            name:          sName
         } = this.state;
 
-        if (oEvent.keyCode == 13) { // isEnter
-            if (aColumns.length) {
-                // Focus on the first one
-                console.log('focus on first column');
-            } else {
-                console.log('create column');
-                let oColumn = {
-                    id:         UUID(),
-                    table_id:   this.props.id,
-                    name:       ''
-                };
+        switch(oEvent.keyCode) {
+            case 13: // ENTER
+                if (aColumns.length) {
+                    // Focus on the first one
+                    console.log('focus on first column');
+                } else {
+                    console.log('create column');
+                    let oColumn = {
+                        id:         UUID(),
+                        table_id:   oTable.id,
+                        name:       ''
+                    };
 
-                this.oCursors.columns.set(oColumn.id, oColumn);
-            }
+                    this.oCursors.columns.set(oColumn.id, oColumn);
+                }
+                break;
+
+            case 8: // BACKSPACE
+                if (sName.length == 0) {
+                    this.oCursors.table.unset();
+
+                    console.log('TODO: Focus on Previous Column');
+                }
+                break;
         }
     }
 }

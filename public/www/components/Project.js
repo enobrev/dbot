@@ -50,23 +50,34 @@ export default class Project extends BaobabComponent {
     };
 
     keyUp = oEvent => {
-        const { project_tables: aTables } = this.state;
+        const { project_tables: aTables, name: sName } = this.state;
 
-        if (oEvent.keyCode == 13) { // isEnter
-            if (aTables.length) {
-                // Focus on the first one
-                console.log('focus on first table');
-            } else {
-                let oTable = {
-                    id:         UUID(),
-                    project_id: this.props.id,
-                    name:       ''
-                };
+        switch(oEvent.keyCode) {
+            case 13: // ENTER
+                if (aTables.length) {
+                    // Focus on the first one
+                    console.log('focus on first table');
+                } else {
+                    console.log('create table');
+                    let oTable = {
+                        id:         UUID(),
+                        project_id: this.props.id,
+                        name:       ''
+                    };
 
-                console.log('create table', oTable);
+                    console.log('create table', oTable);
 
-                this.oCursors.tables.set([oTable.id], oTable);
-            }
+                    this.oCursors.tables.set([oTable.id], oTable);
+                }
+                break;
+
+            case 8: // BACKSPACE
+                if (sName.length == 0) {
+                    this.oCursors.table.unset();
+
+                    console.log('TODO: Focus on Previous Table or Project');
+                }
+                break;
         }
     }
 }

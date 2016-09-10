@@ -14,25 +14,20 @@ export default class Column extends BaobabComponent {
 
     stateQueries() {
         return {
-            columns: {
-                path:    [ 'local', 'columns' ],
-                passive: true
-            },
-            column:  [ 'local', 'columns', this.props.id ]
+            column:  [ 'local', 'columns', this.props.id ],
+            name:    [ 'local', 'columns', this.props.id, 'name' ]
         }
     }
 
     render() {
         const {
-            column: oColumn
+            name: sName
         } = this.state;
-
-        console.log('Column.render');
 
         return (
             <form className="ui form" onSubmit={oEvent => oEvent.preventDefault()}>
                 <div className="field">
-                    <input type="text" ref="input" name="name" value={oColumn.name} placeholder="Column Name" onChange={this.updateName} onKeyUp={this.keyUp} />
+                    <input type="text" ref="input" name="name" value={sName} placeholder="Column Name" onChange={this.updateName} onKeyUp={this.keyUp} />
                 </div>
             </form>
         )
@@ -43,15 +38,15 @@ export default class Column extends BaobabComponent {
     }
 
     updateName = oEvent => {
-        this.oCursors.column.merge({[oEvent.target.name]: oEvent.target.value});
+        this.oCursors.name.set(oEvent.target.value);
     };
 
     keyUp = oEvent => {
-        const { column: oCurrentColumn } = this.state;
+        const { column: oCurrentColumn, name: sName } = this.state;
 
         switch(oEvent.keyCode) {
             case 13: // ENTER
-                if (oCurrentColumn.name.length) {
+                if (sName.length) {
                     console.log('New Column');
                     let oColumn = {
                         id:         UUID(),
@@ -59,17 +54,17 @@ export default class Column extends BaobabComponent {
                         name:       ''
                     };
 
-                    this.oCursors.columns.set(oColumn.id, oColumn);
+                    this.oCursors.column.up().set(oColumn.id, oColumn);
                 } else {
-                    this.oCursors.columns.unset(this.props.id);
+                    this.oCursors.column.unset();
 
-                    console.log('Delete Column, Add Table');
+                    console.log('TODO: Add Table');
                 }
                 break;
 
             case 8: // BACKSPACE
-                if (oCurrentColumn.name.length == 0) {
-                    this.oCursors.columns.unset(this.props.id);
+                if (sName.length == 0) {
+                    this.oCursors.column.unset();
 
                     console.log('TODO: Focus on Previous Column');
                 }
