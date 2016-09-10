@@ -8,12 +8,25 @@
     <head>
         <title><?= $bIsCLI ? '': '* ' ?><?= APP_NAME ?></title>
 
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
-        <meta name="apple-mobile-web-app-capable" content="yes">
-
         <meta charset="utf-8" />
+
+        <script src="/jspm/system.js"></script>
+        <script src="/config.js"></script>
+
+        <?php if ($bIsCLI) {?>
+            <script src="/build.js"></script>
+        <?php } else if(file_exists(__DIR__ . '/.bundles')) { ?>
+            <script src="/.bundles/babel.js"></script>
+            <script src="/.bundles/dependencies.js"></script>
+        <?php } ?>
     </head>
     <body>
-        www
+        <div id="root"></div>
+
+        <script>
+            var API_BASE_URL = '<?= URI_API_DEFAULT ?>';
+
+            System.import('/components/App');
+        </script>
     </body>
 </html>

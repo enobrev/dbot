@@ -7,8 +7,11 @@
       "async": "npm:async@^2.0.1",
       "baobab": "npm:baobab@^2.3.3",
       "crossover": "npm:crossover@^0.6.0",
+      "css": "github:systemjs/plugin-css@^0.1.27",
+      "localforage": "npm:localforage@^1.4.2",
       "react": "npm:react@^15.3.1",
       "react-dom": "npm:react-dom@^15.3.1",
+      "semantic-ui": "github:Semantic-Org/Semantic-UI@^2.2.4",
       "superagent": "npm:superagent@^2.2.0"
     },
     "devDependencies": {

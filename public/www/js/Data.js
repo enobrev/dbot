@@ -7,125 +7,31 @@ import LocalForage from 'localforage';
 import isEquivalent from './isEquivalent';
 import API from './API';
 
-/*
-    cities
-    guides
-    tips
-    check
-    place
-    guestbooks
-    favorites
-    colors
-    fonts
-    users
-    favorites
-    fonts
-    images
-    places
-    place_hours
-    place_types
-    price_ranges
-
- */
-
 LocalForage.config({
-    name:    'Welco.me',
-    version: '1.0'
+    name:    'DBot',
+    version: '2.0'
 });
 
 export default class Data {
     static Base = new Baobab({
-        server: {},
-        local:  {},
+        server: {
+            columns:      {},
+            column_types: {},
+            notes:        {},
+            projects:     {},
+            tables:       {}
+        },
+        local:  {
+            columns:      {},
+            column_types: {},
+            notes:        {},
+            projects:     {},
+            tables:       {}
+        },
         state:  {
-            cms: {
-                cities: {
-                    params: {}
-                },
-                guides: {
-                    params: {}
-                },
-                fonts:  {
-                    params: {}
-                },
-                icons:  {
-                    params: {},
-                    colors: {
-                        background: 'dddddd',
-                        dark:       '000000',
-                        light:      'aaaaaa'
-                    }
-                },
-                places: {
-                    params: {}
-                },
-                people: {
-                    params: {}
-                }
-            },
             www: {
-                APP:    {
-                    location_pending: true,
-                    location_denied:  false,
-                    location:        {
-                        latitude:  null,
-                        longitude: null
-                    },
-                    geo_city:        null,
-                    city_id:         null,
-                    zoom:            3,
-                    url_state:       {},
-                    loading:         false,
-                    component:       null
-                },
-                DOM:    {
-                    width:  1200,
-                    height: 1200,
-                    mobile: false,
-                    OS:     null
-                },
-                nearby: {
-                    slide: 0
-                },
-                me:     {
-                    slide: 0
-                },
-                ask:    {
-                    subject: "Looking for Travel Advice",
-                    message: "I'm traveling soon, and I hope you wouldn't mind making me a travel guide."
-                },
-                search: {
-                    search: '',
-                    data:   {
-                        guides: {},
-                        people: {},
-                        cities: {},
-                        themes: {},
-                        owners: {}
-                    }
-                },
-                guide:  {
-                    editing:           false,
-                    tip_index:         null,
-                    tip_id_add_place:  null,
-                    guestBook:         false,
-                    share:             false,
-                    distances:         {},
-                    availableMapSpace: {
-                        width:  "100%",
-                        height: "100%"
-                    },
-                    markers:           {
-                        map:  [],
-                        tips: {}
-                    }
-                },
-                guide_create: {
-                    active: false,
-                    search: '',
-                    cities: {},
-                    themes: {}
-                }
+                url_state: {},
+                component: null
             }
         }
     });
