@@ -1,10 +1,10 @@
 <?php
     namespace DBot\Table;
 
-    use Enobrev\ORM\Table;
+    use Enobrev\ORM;
     use Enobrev\ORM\Field;
 
-    class Table extends Table {
+    class Table extends ORM\Table {
         protected $sTitle = 'tables';
 
         /** @var Field\Id table_id **/

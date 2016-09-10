@@ -16,5 +16,5 @@
 
     Log::setName(LOGGER_NAME);
     DataMap::setDataFile(__DIR__ . '/lib/API/DataMap.json');
-    Route::init(__DIR__ . '/lib/API', 'TravelGuide\\API', 'TravelGuide\\Table', Enobrev\API\Rest::class, ['v1']);
+    Route::init(__DIR__ . '/lib/API', 'DBot\\API', 'DBot\\Table', Enobrev\API\Rest::class, ['v1']);
     Response::init(URI_DOMAIN, URI_SCHEME, URIS_ALLOW);

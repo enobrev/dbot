@@ -1,12 +1,12 @@
 <?php
     namespace DBot\Table;
 
-    use Enobrev\ORM\Table;
+    use Enobrev\ORM;
     use Enobrev\ORM\Field;
     use Enobrev\ORM\ModifiedDateColumn;
     use Enobrev\ORM\ModifiedDate;
 
-    class Column extends Table implements ModifiedDateColumn {
+    class Column extends ORM\Table implements ModifiedDateColumn {
         use ModifiedDate;
 
         protected $sTitle = 'columns';

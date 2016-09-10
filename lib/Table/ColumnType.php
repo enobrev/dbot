@@ -1,10 +1,10 @@
 <?php
     namespace DBot\Table;
 
-    use Enobrev\ORM\Table;
+    use Enobrev\ORM;
     use Enobrev\ORM\Field;
 
-    class ColumnType extends Table {
+    class ColumnType extends ORM\Table {
         protected $sTitle = 'column_types';
 
         /** @var Field\Id column_type_id **/

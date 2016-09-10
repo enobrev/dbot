@@ -26,5 +26,10 @@
             "type": "vcs",
             "url": "https://github.com/enobrev/tools"
         }
+    },
+    "autoload": {
+        "psr-4": {
+            "DBot\\": "lib/"
+        }
     }
 }
