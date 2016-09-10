@@ -3,7 +3,7 @@
 import React, { PropTypes } from "react";
 import BaobabComponent from './BaobabComponent';
 import Table from './Table';
-import UUID from '../js/UUID';
+import LocalData from '../js/LocalData';
 
 export default class Project extends BaobabComponent {
     static propTypes = {
@@ -56,18 +56,10 @@ export default class Project extends BaobabComponent {
             case 13: // ENTER
                 if (aTables.length) {
                     // Focus on the first one
-                    console.log('focus on first table');
+                    console.log('TODO: focus on first table');
                 } else {
-                    console.log('create table');
-                    let oTable = {
-                        id:         UUID(),
-                        project_id: this.props.id,
-                        name:       ''
-                    };
-
-                    console.log('create table', oTable);
-
-                    this.oCursors.tables.set([oTable.id], oTable);
+                    let oNewTable = LocalData.newTable(this.props.id);
+                    this.oCursors.tables.set(oNewTable.id, oNewTable);
                 }
                 break;
 

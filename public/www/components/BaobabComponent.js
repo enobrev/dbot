@@ -124,11 +124,21 @@ export default class BaobabComponent extends React.Component {
 
         for (let sKey in oState) {
             if (oState[sKey] != this.oData[sKey]) { // HAS TO BE != instead of !==.  See Baobab::helpers::solveUpdate
-                bChanged = true;
-                //aChanged.push(sKey);
+                if (this._iPassive && this._oPassive[sKey] !== undefined) {
+                    // Do noy announce the changes of passive cursors
+                } else {
+                    bChanged = true;
+                    //aChanged.push(sKey);
+                }
 
                 if (this._iAdjusted && this._oAdjusted[sKey] !== undefined) {
                     this._oAdjusted[sKey].adjust(oState);
+
+                    // Passive Cursor, but we have a change to report
+                    if (this._iPassive && this._oPassive[sKey] !== undefined) {
+                        bChanged = true;
+                        //aChanged.push(sKey);
+                    }
                 }
 
                 if (this._iAfter && this._oAfter[sKey] !== undefined) {
@@ -174,6 +184,8 @@ export default class BaobabComponent extends React.Component {
         this._iAdjusted = 0;
         this._oAfter    = {};
         this._iAfter    = 0;
+        this._oPassive  = {};
+        this._iPassive  = 0;
         this.oCursors   = {};
 
         Object.keys(this._oQueries).map(sKey => {
@@ -193,16 +205,13 @@ export default class BaobabComponent extends React.Component {
                 }
 
                 // Only Watch Passive Paths
-                if (mQuery.passive === undefined && !mQuery.passive) {
-                    this._oPaths[sKey]  = sPath;
+                if (mQuery.passive !== undefined && mQuery.passive) {
+                    this._oPassive[ sKey ] = 1;
+                    this._iPassive++;
                 }
-
-                // Always add cursors
-                this.oCursors[sKey] = Data.Base.select(sPath);
-            } else {
-                this._oPaths[sKey]  = sPath;
-                this.oCursors[sKey] = Data.Base.select(sPath);
             }
+            this._oPaths[sKey]  = sPath;
+            this.oCursors[sKey] = Data.Base.select(sPath);
 
         });
 

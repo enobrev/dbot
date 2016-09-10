@@ -3,7 +3,7 @@
 import React, { PropTypes } from "react";
 import BaobabComponent from './BaobabComponent';
 import Column from './Column';
-import UUID from '../js/UUID';
+import LocalData from '../js/LocalData';
 
 export default class Table extends BaobabComponent {
     static propTypes = {
@@ -67,16 +67,10 @@ export default class Table extends BaobabComponent {
             case 13: // ENTER
                 if (aColumns.length) {
                     // Focus on the first one
-                    console.log('focus on first column');
+                    console.log('TODO: focus on first column');
                 } else {
-                    console.log('create column');
-                    let oColumn = {
-                        id:         UUID(),
-                        table_id:   oTable.id,
-                        name:       ''
-                    };
-
-                    this.oCursors.columns.set(oColumn.id, oColumn);
+                    let oNewColumn = LocalData.newColumn(oTable.id);
+                    this.oCursors.columns.set(oNewColumn.id, oNewColumn);
                 }
                 break;
 
@@ -84,7 +78,7 @@ export default class Table extends BaobabComponent {
                 if (sName.length == 0) {
                     this.oCursors.table.unset();
 
-                    console.log('TODO: Focus on Previous Column');
+                    console.log('TODO: Focus on Previous Table or Project');
                 }
                 break;
         }

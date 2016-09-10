@@ -2,8 +2,7 @@
 
 import React, { PropTypes } from "react";
 import BaobabComponent from './BaobabComponent';
-import Data from '../js/Data';
-import UUID from '../js/UUID';
+import LocalData from '../js/LocalData';
 
 export default class Column extends BaobabComponent {
     static propTypes = {
@@ -15,7 +14,11 @@ export default class Column extends BaobabComponent {
     stateQueries() {
         return {
             column:  [ 'local', 'columns', this.props.id ],
-            name:    [ 'local', 'columns', this.props.id, 'name' ]
+            name:    [ 'local', 'columns', this.props.id, 'name' ],
+            tables:   {
+                path:    ['local', 'tables'],
+                adjust:  oState => oState.table = oState.tables[oState.column.table_id]
+            }
         }
     }
 
@@ -42,23 +45,18 @@ export default class Column extends BaobabComponent {
     };
 
     keyUp = oEvent => {
-        const { column: oCurrentColumn, name: sName } = this.state;
+        const { name: sName, table: oTable } = this.state;
 
         switch(oEvent.keyCode) {
             case 13: // ENTER
                 if (sName.length) {
-                    console.log('New Column');
-                    let oColumn = {
-                        id:         UUID(),
-                        table_id:   oCurrentColumn.table_id,
-                        name:       ''
-                    };
-
-                    this.oCursors.column.up().set(oColumn.id, oColumn);
+                    let oNewColumn = LocalData.newColumn(oTable.id);
+                    this.oCursors.column.up().set(oNewColumn.id, oNewColumn);
                 } else {
-                    this.oCursors.column.unset();
+                    let oNewTable = LocalData.newTable(oTable.project_id);
 
-                    console.log('TODO: Add Table');
+                    this.oCursors.column.unset();
+                    this.oCursors.tables.set(oNewTable.id, oNewTable);
                 }
                 break;
 
