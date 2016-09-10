@@ -116,18 +116,22 @@ export default class BaobabComponent extends React.Component {
         }
 
         let oState   = Object.assign({}, this.state, this.oWatcher.get());
-        let aChanged = [];
+        let oChanged = {};
 
         Object.keys(oState).map(sKey => {
             if (oState[sKey] != this.state[sKey]) { // HAS TO BE != instead of !==.  See Baobab::helpers::solveUpdate
-                aChanged.push(sKey);
-                oState = Object.assign(oState, this.adjustStateFromCursor(sKey, oState[sKey], oState));
+                oChanged[sKey] = {
+                    from: this.state[sKey],
+                    to:   oState[sKey]
+                };
+                this.adjustStateFromCursor(sKey, oState);
             }
         });
 
+        let aChanged = Object.keys(oChanged);
         let fDone = () => aChanged.map(sKey => this.onAfterCursorData(sKey, oState[sKey]));
 
-        // console.log('CHANGED:', aChanged);
+        console.log('CHANGED:', oChanged);
 
         if (aChanged.length) {
             if (oEvent) { // Handler
@@ -139,10 +143,8 @@ export default class BaobabComponent extends React.Component {
         }
     };
 
-    adjustStateFromCursor(sKey, mNewData, oPreviousState) { // OVERRIDE ME
-        return {
-            [sKey]: mNewData
-        };
+    adjustStateFromCursor(sKey, oPreviousState) { // OVERRIDE ME
+
     };
 
     onAfterCursorData(sKey, mData) { // OVERRIDE ME
