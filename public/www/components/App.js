@@ -16,20 +16,16 @@ import 'semantic-ui/semantic.css!';
 export default class App extends BaobabComponent {
     stateQueries() {
         return {
-            projects: [ 'local', 'projects' ]
-        }
-    }
-
-    adjustStateFromCursor(sKey, oState) {
-        switch (sKey) {
-            case 'projects':
-                oState.project_array = Object.values(oState[sKey]);
-                break;
+            projects: {
+                path:   [ 'local', 'projects' ],
+                adjust: oState => oState.projects = Object.values(oState.projects)
+            }
         }
     }
 
     render() {
-        const { project_array: aProjects } = this.state;
+        const { projects: aProjects } = this.state;
+
         return (
             <div className="ui stackable celled grid container">
                 <div className="row">
@@ -40,7 +36,7 @@ export default class App extends BaobabComponent {
                     </div>
                 </div>
 
-                {aProjects.map(oProject => (
+                {aProjects && aProjects.map(oProject => (
                     <div className="row" key={oProject.id}>
                         <div className="column">
                             <Project id={oProject.id} />

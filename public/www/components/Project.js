@@ -15,25 +15,18 @@ export default class Project extends BaobabComponent {
     stateQueries() {
         return {
             name:   [ 'local', 'projects', this.props.id, 'name' ],
-            tables: [ 'local', 'tables' ],
-        }
-    }
-
-    adjustStateFromCursor(sKey, oState) {
-        switch (sKey) {
-            case 'tables':
-                oState.project_tables = Object.values(oState.tables).filter(oTable => oTable.project_id == this.props.id);
-                break;
+            tables: {
+                path:   [ 'local', 'tables' ],
+                adjust: oState => oState.tables = Object.values(oState.tables).filter(oTable => oTable.project_id == this.props.id)
+            }
         }
     }
 
     render() {
         const {
-            name:           sName,
-            project_tables: aTables
+            name:   sName,
+            tables: aTables
         } = this.state;
-
-        console.log('Project.render');
 
         return (
             <div className="ui segment">
@@ -57,7 +50,7 @@ export default class Project extends BaobabComponent {
     };
 
     keyUp = oEvent => {
-        const { project_tables: aTables } = this.state;
+        const { tables: aTables } = this.state;
 
         if (oEvent.keyCode == 13) { // isEnter
             if (aTables.length) {

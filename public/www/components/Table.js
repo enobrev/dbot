@@ -17,16 +17,8 @@ export default class Table extends BaobabComponent {
             table:   [ 'local', 'tables', this.props.id ],
             columns: {
                 path:   [ 'local', 'columns' ],
-                filter: oColumn => oColumn.id == this.props.id
+                adjust: oState => oState.columns = Object.values(oState.columns).filter(oTable => oTable.table_id == this.props.id)
             }
-        }
-    }
-
-    adjustStateFromCursor(sKey, oState) {
-        switch (sKey) {
-            case 'columns':
-                oState.table_columns = Object.values(oState.columns).filter(oTable => oTable.table_id == this.props.id);
-                break;
         }
     }
 
@@ -34,8 +26,6 @@ export default class Table extends BaobabComponent {
         const {
             table:         oTable
         } = this.state;
-
-        console.log('Table.render');
 
         return (
             <div className="ui segment">
@@ -52,7 +42,7 @@ export default class Table extends BaobabComponent {
 
     renderColumns() {
         const {
-            table_columns: aColumns
+            columns: aColumns
         } = this.state;
 
         if (aColumns.length == 0) {
@@ -77,7 +67,7 @@ export default class Table extends BaobabComponent {
     keyUp = oEvent => {
         const {
             table:         oTable,
-            table_columns: aColumns
+            columns: aColumns
         } = this.state;
 
         if (oEvent.keyCode == 13) { // isEnter

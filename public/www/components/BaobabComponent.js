@@ -82,6 +82,7 @@ export default class BaobabComponent extends React.Component {
 
     watch() {
         this.oCursors = {};
+        this.oData    = {};
         this.state    = {};
 
         this.bWatch   = true;
@@ -103,10 +104,8 @@ export default class BaobabComponent extends React.Component {
     }
 
     _treeUpdate = oEvent => {
-        let aPath = solveUpdate(oEvent.data.paths, this._aPaths);
-
-        if (aPath !== false) {
-            oEvent.solved = aPath;
+        let aChangedPath = solveUpdate(oEvent.data.paths, this._aPaths)
+        if (aChangedPath !== false) {
             this.onWatcherData(oEvent);
         }
     };
@@ -116,31 +115,32 @@ export default class BaobabComponent extends React.Component {
             return;
         }
 
-        if (oEvent) {
-            console.log(this.constructor.name, 'onWatcherData', oEvent.solved, oEvent.data.paths, oEvent.data.transaction);
-        } else {
-            console.log(this.constructor.name, 'onWatcherData.init');
+        let oState   = this._getData();
+        let oAfter   = {};
+        //let aChanged = [];
+        let bChanged = false;
+
+        for (let sKey in oState) {
+            if (oState[sKey] != this.oData[sKey]) { // HAS TO BE != instead of !==.  See Baobab::helpers::solveUpdate
+                bChanged = true;
+                //aChanged.push(sKey);
+
+                if (this._iAdjusted && this._oAdjusted[sKey] !== undefined) {
+                    this._oAdjusted[sKey].adjust(oState);
+                }
+
+                if (this._iAfter && this._oAfter[sKey] !== undefined) {
+                    oAfter[sKey] = this._oAfter[sKey];
+                }
+            }
         }
 
-        let oState   = Object.assign({}, this.state, this._getData());
-        let oChanged = {};
+        if (bChanged) {
+            // console.log('CHANGED:', aChanged, oState);
 
-        Object.keys(oState).map(sKey => {
-            if (oState[sKey] != this.state[sKey]) { // HAS TO BE != instead of !==.  See Baobab::helpers::solveUpdate
-                oChanged[sKey] = {
-                    from: this.state[sKey],
-                    to:   oState[sKey]
-                };
-                this.adjustStateFromCursor(sKey, oState);
-            }
-        });
+            let fDone  = () => Object.keys(oAfter).map(sKey => oAfter[sKey].after(oState));
+            this.oData = oState;
 
-        let aChanged = Object.keys(oChanged);
-        let fDone = () => aChanged.map(sKey => this.onAfterCursorData(sKey, oState[sKey]));
-
-        console.log('CHANGED:', oChanged);
-
-        if (aChanged.length) {
             if (oEvent) { // Handler
                 this.setState(oState, fDone);
             } else {      // Virgin
@@ -148,14 +148,6 @@ export default class BaobabComponent extends React.Component {
                 fDone();
             }
         }
-    };
-
-    adjustStateFromCursor(sKey, oPreviousState) { // OVERRIDE ME
-
-    };
-
-    onAfterCursorData(sKey, mData) { // OVERRIDE ME
-
     };
 
     componentWillMount() {
@@ -178,15 +170,32 @@ export default class BaobabComponent extends React.Component {
     };
 
     _refresh() {
-        this._oPaths  = {};
-        this.oCursors = {};
+        this._oPaths    = {};
+        this._oAdjusted = {};
+        this._iAdjusted = 0;
+        this._oAfter    = {};
+        this._iAfter    = 0;
+        this.oCursors   = {};
 
         Object.keys(this._oQueries).map(sKey => {
-            let mQuery = this._oQueries[sKey];
-            let sPath  = Array.isArray(mQuery) ? mQuery : mQuery.path;
+            let mQuery    = this._oQueries[sKey];
+            let bIsPath   = Array.isArray(mQuery);
+            let sPath     = bIsPath ? mQuery : mQuery.path;
 
             this._oPaths[sKey]  = sPath;
             this.oCursors[sKey] = Data.Base.select(sPath);
+
+            if (!bIsPath) {
+                if (typeof mQuery.adjust == 'function') {
+                    this._oAdjusted[ sKey ] = mQuery;
+                    this._iAdjusted++;
+                }
+
+                if (typeof mQuery.after == 'function') {
+                    this._oAfter[ sKey ] = mQuery;
+                    this._iAfter++;
+                }
+            }
         });
 
         this._aPaths  = Object.values(this._oPaths);
