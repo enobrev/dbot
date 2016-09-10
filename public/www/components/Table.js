@@ -15,7 +15,10 @@ export default class Table extends BaobabComponent {
     stateQueries() {
         return {
             table:   [ 'local', 'tables', this.props.id ],
-            columns: [ 'local', 'columns' ],
+            columns: {
+                path:   [ 'local', 'columns' ],
+                filter: oColumn => oColumn.id == this.props.id
+            }
         }
     }
 

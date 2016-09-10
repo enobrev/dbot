@@ -14,8 +14,8 @@ export default class Project extends BaobabComponent {
 
     stateQueries() {
         return {
-            project: [ 'local', 'projects', this.props.id ],
-            tables:  [ 'local', 'tables' ],
+            name:   [ 'local', 'projects', this.props.id, 'name' ],
+            tables: [ 'local', 'tables' ],
         }
     }
 
@@ -29,7 +29,7 @@ export default class Project extends BaobabComponent {
 
     render() {
         const {
-            project:        oProject,
+            name:           sName,
             project_tables: aTables
         } = this.state;
 
@@ -39,7 +39,7 @@ export default class Project extends BaobabComponent {
             <div className="ui segment">
                 <form className="ui form" onSubmit={oEvent => oEvent.preventDefault()}>
                     <div className="header basic field">
-                        <input type="text" ref="input" name="name" value={oProject.name} placeholder="Project Name" onChange={this.updateName} onKeyUp={this.keyUp} />
+                        <input type="text" ref="input" name="name" value={sName} placeholder="Project Name" onChange={this.updateName} onKeyUp={this.keyUp} />
                     </div>
                 </form>
 
@@ -53,14 +53,11 @@ export default class Project extends BaobabComponent {
     }
 
     updateName = oEvent => {
-        this.oCursors.project.merge({[oEvent.target.name]: oEvent.target.value});
+        this.oCursors.name.set(oEvent.target.value);
     };
 
     keyUp = oEvent => {
-        const {
-            project:        oProject,
-            project_tables: aTables
-        } = this.state;
+        const { project_tables: aTables } = this.state;
 
         if (oEvent.keyCode == 13) { // isEnter
             if (aTables.length) {
@@ -69,13 +66,13 @@ export default class Project extends BaobabComponent {
             } else {
                 let oTable = {
                     id:         UUID(),
-                    project_id: oProject.id,
+                    project_id: this.props.id,
                     name:       ''
                 };
 
                 console.log('create table', oTable);
 
-                this.oCursors.tables.merge({[oTable.id]: oTable});
+                this.oCursors.tables.set([oTable.id], oTable);
             }
         }
     }

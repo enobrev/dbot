@@ -85,37 +85,44 @@ export default class BaobabComponent extends React.Component {
         this.state    = {};
 
         this.bWatch   = true;
-        this.oQueries = this.stateQueries();
-
-        this.oWatcher = Data.Base.watch(this.oQueries);
-        this.oCursors = this.oWatcher.getCursors();
+        this._oQueries = this.stateQueries();
+        this._refresh();
 
         this.onWatcherData();
-        this.oWatcher.on('update', this.onWatcherData);
-
-        this.queryAPI();
-    }
-
-    queryAPI() {
-
+        Data.Base.on('update', this._treeUpdate);
     }
 
     addCursor(sKey, oQuery) {
-        this.oQueries[sKey] = oQuery;
-        this.oWatcher.refresh(this.oQueries);
+        this._oQueries[sKey] = oQuery;
+        this._refresh();
     }
 
     removeCursor(sKey) {
-        delete this.oQueries[sKey];
-        this.oWatcher.refresh(this.oQueries);
+        delete this._oQueries[sKey];
+        this._refresh();
     }
+
+    _treeUpdate = oEvent => {
+        let aPath = solveUpdate(oEvent.data.paths, this._aPaths);
+
+        if (aPath !== false) {
+            oEvent.solved = aPath;
+            this.onWatcherData(oEvent);
+        }
+    };
 
     onWatcherData = oEvent => {
         if (!this.bWatch) {
             return;
         }
 
-        let oState   = Object.assign({}, this.state, this.oWatcher.get());
+        if (oEvent) {
+            console.log(this.constructor.name, 'onWatcherData', oEvent.solved, oEvent.data.paths, oEvent.data.transaction);
+        } else {
+            console.log(this.constructor.name, 'onWatcherData.init');
+        }
+
+        let oState   = Object.assign({}, this.state, this._getData());
         let oChanged = {};
 
         Object.keys(oState).map(sKey => {
@@ -168,5 +175,77 @@ export default class BaobabComponent extends React.Component {
 
     onBoundInputChange = oEvent => {
         this.oCursors[oEvent.target.name].set(oEvent.target.value);
+    };
+
+    _refresh() {
+        this._oPaths  = {};
+        this.oCursors = {};
+
+        Object.keys(this._oQueries).map(sKey => {
+            let mQuery = this._oQueries[sKey];
+            let sPath  = Array.isArray(mQuery) ? mQuery : mQuery.path;
+
+            this._oPaths[sKey]  = sPath;
+            this.oCursors[sKey] = Data.Base.select(sPath);
+        });
+
+        this._aPaths  = Object.values(this._oPaths);
+        this._getData = Data.Base.project.bind(Data.Base, this._oPaths);
     }
+}
+
+
+/**
+ * Function determining whether some paths in the tree were affected by some
+ * updates that occurred at the given paths. This helper is mainly used at
+ * cursor level to determine whether the cursor is concerned by the updates
+ * fired at tree level.
+ *
+ * NOTES: 1) If performance become an issue, the following threefold loop
+ *           can be simplified to a complex twofold one.
+ *        2) A regex version could also work but I am not confident it would
+ *           be faster.
+ *        3) Another solution would be to keep a register of cursors like with
+ *           the monkeys and update along this tree.
+ *
+ * @param  {array} affectedPaths - The paths that were updated.
+ * @param  {array} comparedPaths - The paths that we are actually interested in.
+ * @return {boolean}             - Is the update relevant to the compared
+ *                                 paths?
+ */
+
+function solveUpdate(affectedPaths, comparedPaths) {
+    let i, j, k, l, m, n, p, c, s;
+
+    // Looping through possible paths
+    for (i = 0, l = affectedPaths.length; i < l; i++) {
+        p = affectedPaths[i];
+
+        if (!p.length)
+            return p;
+
+        // Looping through logged paths
+        for (j = 0, m = comparedPaths.length; j < m; j++) {
+            c = comparedPaths[j];
+
+            if (!c || !c.length)
+                return p;
+
+            // Looping through steps
+            for (k = 0, n = c.length; k < n; k++) {
+                s = c[k];
+
+                // If path is not relevant, we break
+                // NOTE: the '!=' instead of '!==' is required here!
+                if (s != p[k])
+                    break;
+
+                // If we reached last item and we are relevant
+                if (k + 1 === n || k + 1 === p.length)
+                    return p;
+            }
+        }
+    }
+
+    return false;
 }

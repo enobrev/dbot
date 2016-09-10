@@ -43,9 +43,7 @@ export default class Column extends BaobabComponent {
     };
 
     keyUp = oEvent => {
-        const {
-            column: oCurrentColumn
-        } = this.state;
+        const { column: oCurrentColumn } = this.state;
 
         switch(oEvent.keyCode) {
             case 13: // ENTER
@@ -59,7 +57,7 @@ export default class Column extends BaobabComponent {
 
                     Data.Base.select('local', 'columns').set(oColumn.id, oColumn);
                 } else {
-                    Data.Base.select('local', 'columns').unset(oCurrentColumn.id);
+                    Data.Base.select('local', 'columns').unset(this.props.id);
 
                     console.log('Delete Column, Add Table');
                 }
@@ -67,7 +65,7 @@ export default class Column extends BaobabComponent {
 
             case 8: // BACKSPACE
                 if (oCurrentColumn.name.length == 0) {
-                    this.oCursors.columns.unset(oCurrentColumn.id);
+                    Data.Base.select('local', 'columns').unset(this.props.id);
 
                     console.log('TODO: Focus on Previous Column');
                 }
