@@ -37,12 +37,10 @@ export default class Column extends BaobabComponent {
             name: sName
         } = this.state;
 
-        console.log('Column', this.state);
-
         return (
             <form className="ui form" onSubmit={oEvent => oEvent.preventDefault()}>
                 <div className="field">
-                    <input type="text" ref="input" name="name" value={sName} placeholder="Column Name" onChange={this.updateName} onKeyUp={this.keyUp} />
+                    <input type="text" ref="input" name="name" value={sName} placeholder="Column Name" onChange={this.updateName} onKeyDown={this.onKeyDown} />
                 </div>
             </form>
         )
@@ -56,7 +54,7 @@ export default class Column extends BaobabComponent {
         this.oCursors.name.set(oEvent.target.value);
     };
 
-    keyUp = oEvent => {
+    onKeyDown = oEvent => {
         const { name: sName, table: oTable, table_columns: aColumns, column_index: iIndex } = this.state;
 
         switch(oEvent.keyCode) {

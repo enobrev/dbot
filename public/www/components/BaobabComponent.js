@@ -116,12 +116,12 @@ export default class BaobabComponent extends React.Component {
             return;
         }
 
-        let oState   = Object.assign({}, this.oData, this._getData());
-        let aKeys    = new Set(Object.keys(oState));
-        let aAfter   = [];
+        let oState = Object.assign({}, this.oData, this._getData());
+        let aKeys  = new Set(Object.keys(oState));
+        let aAfter = [];
 
         this.bChanged = false;
-        this.aChanged = [];
+        // this.aChanged = []; // For Tracking and Debugging
 
         for (let sKey in oState) {
             this._processState(oState, sKey, aAfter);
@@ -139,7 +139,7 @@ export default class BaobabComponent extends React.Component {
         }
 
         if (this.bChanged) {
-            console.log('CHANGED', this.constructor.name, this.aChanged, oEvent, aAfter);
+            //console.log('CHANGED', this.constructor.name, this.aChanged, oEvent, aAfter);
 
             let fDone  = () => aAfter.map(fAfter => fAfter(oState));
             this.oData = oState;
@@ -163,9 +163,8 @@ export default class BaobabComponent extends React.Component {
         if (this._bPassive && this._oPassive[sKey] !== undefined) {
             // Do Not Notify updates for This Key
         } else if (bKeyDataChanged) {
-            //console.log('onWatcherData.changed', this.constructor.name, sKey, Object.assign({}, oState));
             this.bChanged = true;
-            this.aChanged.push(sKey);
+            // this.aChanged.push(sKey); // For Tracking and Debugging
 
             if (this._bAfter && this._oAfter[sKey] !== undefined) {
                 aAfter.push(this._oAfter[sKey].after);
@@ -182,13 +181,7 @@ export default class BaobabComponent extends React.Component {
     }
 
     shouldComponentUpdate(oNextProps, oNextState) {
-        let bUpdate = shallowCompare(this, oNextProps, oNextState);
-
-        if (bUpdate) {
-            console.log('shouldComponentUpdate', this.constructor.name);
-        }
-
-        return bUpdate;
+        return shallowCompare(this, oNextProps, oNextState);
     }
 
     onBoundInputChange = oEvent => {
