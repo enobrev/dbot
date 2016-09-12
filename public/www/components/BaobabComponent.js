@@ -2,7 +2,6 @@
 
 import React, {PropTypes} from "react";
 import Data from '../js/Data';
-import UUID from '../js/UUID';
 import shallowCompare from 'react-addons-shallow-compare'
 
 /**
@@ -117,43 +116,32 @@ export default class BaobabComponent extends React.Component {
             return;
         }
 
-        let oState   = this._getData();
-        let oAfter   = {};
-        let bChanged = false;
-        //let aChanged = [];
+        let oState   = Object.assign({}, this.oData, this._getData());
+        let aKeys    = new Set(Object.keys(oState));
+        let aAfter   = [];
+
+        this.bChanged = false;
+        this.aChanged = [];
 
         for (let sKey in oState) {
-            if (oState[sKey] != this.oData[sKey]) { // HAS TO BE != instead of !==.  See Baobab::helpers::solveUpdate
-                let bPassed = false;
+            this._processState(oState, sKey, aAfter);
+        }
 
-                if (this._iPassive && this._oPassive[sKey] !== undefined) {
-                    // Do noy announce the changes of passive cursors
-                    bPassed  = true;
-                } else {
-                    bChanged = true;
-                    //aChanged.push(sKey);
-                }
-
-                if (this._iAdjusted && this._oAdjusted[sKey] !== undefined) {
-                    this._oAdjusted[sKey].adjust(oState);
-
-                    // Passive Cursor, but we have a change to report
-                    if (bPassed) {
-                        bChanged = true;
-                        //aChanged.push(sKey);
-                    }
-                }
-
-                if (this._iAfter && this._oAfter[sKey] !== undefined) {
-                    oAfter[sKey] = this._oAfter[sKey];
+        // Process anything new created by processing state
+        let aCheckForNewKeys = new Set(Object.keys(oState));
+        if (aCheckForNewKeys.size > aKeys.size) {
+            let aNewKeys = new Set([ ...aCheckForNewKeys ].filter(x => !aKeys.has(x)));
+            if (aNewKeys.size > 0) {
+                for (let sKey of aNewKeys) {
+                    this._processState(oState, sKey, aAfter);
                 }
             }
         }
 
-        if (bChanged) {
-            //console.log('CHANGED', this.constructor.name, aChanged, oEvent);
+        if (this.bChanged) {
+            console.log('CHANGED', this.constructor.name, this.aChanged, oEvent, aAfter);
 
-            let fDone  = () => Object.keys(oAfter).map(sKey => oAfter[sKey].after(oState));
+            let fDone  = () => aAfter.map(fAfter => fAfter(oState));
             this.oData = oState;
 
             if (oEvent) { // Handler
@@ -161,6 +149,26 @@ export default class BaobabComponent extends React.Component {
             } else {      // Virgin
                 this.state = oState;
                 fDone();
+            }
+        }
+    };
+
+    _processState = (oState, sKey, aAfter) => {
+        let bKeyDataChanged = oState[sKey] != this.oData[sKey];
+
+        if (bKeyDataChanged && this._bAdjusted && this._oAdjusted[ sKey ] !== undefined) {
+            this._oAdjusted[ sKey ].adjust(oState);
+        }
+
+        if (this._bPassive && this._oPassive[sKey] !== undefined) {
+            // Do Not Notify updates for This Key
+        } else if (bKeyDataChanged) {
+            //console.log('onWatcherData.changed', this.constructor.name, sKey, Object.assign({}, oState));
+            this.bChanged = true;
+            this.aChanged.push(sKey);
+
+            if (this._bAfter && this._oAfter[sKey] !== undefined) {
+                aAfter.push(this._oAfter[sKey].after);
             }
         }
     };
@@ -174,7 +182,13 @@ export default class BaobabComponent extends React.Component {
     }
 
     shouldComponentUpdate(oNextProps, oNextState) {
-        return shallowCompare(this, oNextProps, oNextState);
+        let bUpdate = shallowCompare(this, oNextProps, oNextState);
+
+        if (bUpdate) {
+            console.log('shouldComponentUpdate', this.constructor.name);
+        }
+
+        return bUpdate;
     }
 
     onBoundInputChange = oEvent => {
@@ -182,39 +196,49 @@ export default class BaobabComponent extends React.Component {
     };
 
     _refresh() {
+        this._bAdjusted = false;
+        this._bAfter    = false;
+        this._bPassive  = false;
+
         this._oPaths    = {};
         this._oAdjusted = {};
-        this._iAdjusted = 0;
         this._oAfter    = {};
-        this._iAfter    = 0;
         this._oPassive  = {};
-        this._iPassive  = 0;
         this.oCursors   = {};
 
         Object.keys(this._oQueries).map(sKey => {
             let mQuery    = this._oQueries[sKey];
             let bIsPath   = Array.isArray(mQuery);
-            let sPath     = bIsPath ? mQuery : mQuery.path;
+            let sPath;
 
-            if (!bIsPath) {
+            if (bIsPath) {
+                sPath     = mQuery;
+            } else {
+                if (mQuery.path !== undefined) {
+                    sPath = mQuery.path
+                }
+
                 if (typeof mQuery.adjust == 'function') {
                     this._oAdjusted[ sKey ] = mQuery;
-                    this._iAdjusted++;
+                    this._bAdjusted = true;
                 }
 
                 if (typeof mQuery.after == 'function') {
                     this._oAfter[ sKey ] = mQuery;
-                    this._iAfter++;
+                    this._bAfter = true;
                 }
 
                 // Only Watch Passive Paths
                 if (mQuery.passive !== undefined && mQuery.passive) {
                     this._oPassive[ sKey ] = 1;
-                    this._iPassive++;
+                    this._bPassive = true;
                 }
             }
-            this._oPaths[sKey]  = sPath;
-            this.oCursors[sKey] = Data.Base.select(sPath);
+
+            if (sPath) {
+                this._oPaths[ sKey ]  = sPath;
+                this.oCursors[ sKey ] = Data.Base.select(sPath);
+            }
 
         });
 
@@ -225,6 +249,10 @@ export default class BaobabComponent extends React.Component {
 
 
 /**
+ * Ripped from baobab::helpers - used to figure out if a watched path has been changed
+ *
+ * ---
+ *
  * Function determining whether some paths in the tree were affected by some
  * updates that occurred at the given paths. This helper is mainly used at
  * cursor level to determine whether the cursor is concerned by the updates

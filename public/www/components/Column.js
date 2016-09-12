@@ -2,7 +2,6 @@
 
 import React, { PropTypes } from "react";
 import BaobabComponent from './BaobabComponent';
-import Data from '../js/Data';
 import LocalData from '../js/LocalData';
 
 export default class Column extends BaobabComponent {
@@ -24,11 +23,11 @@ export default class Column extends BaobabComponent {
             columns: {
                 path: [ 'local', 'columns' ],
                 passive: true,
-                adjust: oState => {
-                    oState.table_columns = Object.values(oState.columns).filter(oColumn => oColumn.table_id == oState.column.table_id);
-                    oState.column_index  = oState.table_columns.findIndex(oColumn => oColumn.id == oState.column.id);
-
-                }
+                adjust: oState => oState.table_columns = Object.values(oState.columns).filter(oColumn => oColumn.table_id == oState.column.table_id)
+            },
+            table_columns: {
+                passive: true,
+                adjust: oState => oState.column_index  = oState.table_columns.findIndex(oColumn => oColumn.id == oState.column.id)
             }
         }
     }
@@ -37,6 +36,8 @@ export default class Column extends BaobabComponent {
         const {
             name: sName
         } = this.state;
+
+        console.log('Column', this.state);
 
         return (
             <form className="ui form" onSubmit={oEvent => oEvent.preventDefault()}>
@@ -62,6 +63,7 @@ export default class Column extends BaobabComponent {
             case 13: // ENTER
                 if (sName.length) {
                     let oNewColumn = LocalData.newColumn(oTable.id);
+                    console.log('New Column', oNewColumn)
                     this.oCursors.column.up().set(oNewColumn.id, oNewColumn);
                 } else {
                     let oNewTable = LocalData.newTable(oTable.project_id);

@@ -17,11 +17,12 @@ export default class Table extends BaobabComponent {
             table:  [ 'local', 'tables', this.props.id ],
             name:   [ 'local', 'tables', this.props.id, 'name' ],
             columns: {
-                path:   [ 'local', 'columns' ],
-                adjust: oState => {
-                    oState.table_columns = Object.values(oState.columns).filter(oTable => oTable.table_id == this.props.id);
-                    oState.show          = oState.table_columns.length > 0;
-                }
+                path:    [ 'local', 'columns' ],
+                passive: true,
+                adjust:  oState => oState.table_columns = Object.values(oState.columns).filter(oTable => oTable.table_id == this.props.id)
+            },
+            table_columns: {
+                adjust: oState => oState.show = oState.table_columns.length > 0
             }
         }
     }

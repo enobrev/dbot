@@ -31,7 +31,10 @@ export default class App extends BaobabComponent {
                 <div className="row">
                     <div className="column">
                         <div className="ui segment">
-                            <div className="ui icon button" onClick={this.addProject}><i className="add icon" /> Add Project</div>
+                            <div className="ui buttons">
+                                <div className="ui icon button" onClick={this.addProject}><i className="add icon" /> Add Project</div>
+                                <div className="ui icon button" onClick={this.save}><i className="save icon" /> Save</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -50,7 +53,7 @@ export default class App extends BaobabComponent {
     componentWillMount() {
         super.componentWillMount();
 
-        API.query(['columns', 'column_types', 'notes', 'projects_array', 'tables'], (oError, oResponse) => Data.mergeResponse(oResponse));
+        API.query(['columns', 'column_types', 'notes', 'projects', 'tables'], (oError, oResponse) => Data.mergeResponse(oResponse));
     }
 
     addProject = () => {
@@ -60,7 +63,18 @@ export default class App extends BaobabComponent {
         };
 
         this.oCursors.projects.set(oProject.id, oProject);
-    }
+    };
+
+    save = () => {
+        API.query(
+            Data.Base.project({
+                projects: ['local', 'projects'],
+                tables:   ['local', 'tables'],
+                columns:  ['local', 'columns']
+            }),
+            (oError, oResponse) => Data.mergeResponse(oResponse)
+        );
+    };
 }
 
 ReactDOM.render(<App />, document.getElementById('root'));

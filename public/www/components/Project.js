@@ -24,7 +24,7 @@ export default class Project extends BaobabComponent {
 
     render() {
         const {
-            name:   sName,
+            name:           sName,
             project_tables: aTables
         } = this.state;
 
