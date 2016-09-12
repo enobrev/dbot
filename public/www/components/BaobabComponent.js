@@ -183,18 +183,18 @@ export default class BaobabComponent extends React.Component {
     _processState = (oState, sKey) => {
         let bKeyDataChanged = oState[sKey] != this.oData[sKey];
 
-        if (bKeyDataChanged && this._bBefore && this._oBefore[ sKey ] !== undefined) {
-            this._oBefore[ sKey ].setState(oState);
+        if (bKeyDataChanged && this._bBefore && this._oBefore.has(sKey)) {
+            this._oQueries[ sKey ].setState(oState);
         }
 
-        if (this._bPassive && this._oPassive[sKey] !== undefined) {
+        if (this._bPassive && this._oPassive.has(sKey)) {
             // Do Not Notify updates for This Key
         } else if (bKeyDataChanged) {
             this.bChanged = true;
             // this.aChanged.push(sKey); // For Tracking and Debugging
 
-            if (this._bAfter && this._oAfter[sKey] !== undefined) { // We're not running onUpdate methods until after we've updated our state
-                this.aAfter.push(this._oAfter[sKey].after);
+            if (this._bAfter && this._oAfter.has(sKey)) { // We're not running onUpdate methods until after we've updated our state
+                this.aAfter.push(this._oQueries[sKey].onUpdate);
             }
         }
     };
@@ -220,14 +220,10 @@ export default class BaobabComponent extends React.Component {
      * @private
      */
     _refresh() {
-        this._bBefore = false;
-        this._bAfter   = false;
-        this._bPassive = false;
-
+        this._oBefore  = new Set();
+        this._oAfter   = new Set();
+        this._oPassive = new Set();
         this._oPaths   = {};
-        this._oBefore  = {};
-        this._oAfter   = {};
-        this._oPassive = {};
         this.CURSORS   = {};
 
         Object.keys(this._oQueries).map(sKey => {
@@ -243,31 +239,29 @@ export default class BaobabComponent extends React.Component {
                 }
 
                 if (typeof mQuery.setState == 'function') {
-                    this._oBefore[ sKey ] = mQuery;
-                    this._bBefore = true;
+                    this._oBefore.add(sKey);
                 }
 
                 if (typeof mQuery.onUpdate == 'function') {
-                    this._oAfter[ sKey ] = mQuery;
-                    this._bAfter = true;
+                    this._oAfter.add(sKey);
                 }
 
-                // Only Watch Passive Paths
                 if (mQuery.invokeRender !== undefined && mQuery.invokeRender === false) {
-                    this._oPassive[ sKey ] = 1;
-                    this._bPassive = true;
+                    this._oPassive.add(sKey);
                 }
             }
 
             if (sPath) {
-                this._oPaths[ sKey ]  = sPath;
+                this._oPaths[ sKey ] = sPath;
                 this.CURSORS[ sKey ] = Data.Base.select(sPath);
             }
-
         });
 
-        this._aPaths  = Object.values(this._oPaths);
-        this._getData = Data.Base.project.bind(Data.Base, this._oPaths);
+        this._bBefore  = this._oBefore.size  > 0;
+        this._bAfter   = this._oAfter.size   > 0;
+        this._bPassive = this._oPassive.size > 0;
+        this._aPaths   = Object.values(this._oPaths);
+        this._getData  = Data.Base.project.bind(Data.Base, this._oPaths);
     }
 }
 
