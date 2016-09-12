@@ -16,18 +16,18 @@ export default class Column extends BaobabComponent {
             column:  [ 'local', 'columns', this.props.id ],
             name:    [ 'local', 'columns', this.props.id, 'name' ],
             tables:   {
-                path:    ['local', 'tables'],
-                passive: true,
-                adjust:  oState => oState.table = oState.tables[oState.column.table_id]
+                cursor:    ['local', 'tables'],
+                invokeRender: false,
+                setState:  oState => oState.table = oState.tables[oState.column.table_id]
             },
             columns: {
-                path: [ 'local', 'columns' ],
-                passive: true,
-                adjust: oState => oState.table_columns = Object.values(oState.columns).filter(oColumn => oColumn.table_id == oState.column.table_id)
+                cursor: [ 'local', 'columns' ],
+                invokeRender: false,
+                setState: oState => oState.table_columns = Object.values(oState.columns).filter(oColumn => oColumn.table_id == oState.column.table_id)
             },
             table_columns: {
-                passive: true,
-                adjust: oState => oState.column_index  = oState.table_columns.findIndex(oColumn => oColumn.id == oState.column.id)
+                invokeRender: false,
+                setState: oState => oState.column_index  = oState.table_columns.findIndex(oColumn => oColumn.id == oState.column.id)
             }
         }
     }

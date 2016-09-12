@@ -6,92 +6,80 @@ import shallowCompare from 'react-addons-shallow-compare'
 
 /**
  * Components should extend this component.  The extending components should override the stateQueries method.
- * This method returns an object holding Baobab queries, which affect the component render.  Consider it the
+ * This method returns an object holding Baobab cursor queries, which affect the component render.  Consider it the
  * State of the Component
  *
  *
- * Example:
- *
-
-    stateQueries() {
-        const aProjectId    = ['state', 'url', 'project_id'];
-
-        const sProjectId    = Data.Base.get(aProjectId);
-        const iPriceId      = Data.filterFirst(Data._.prices, oPrice => oPrice.type == 'Line').id;
-
-        return {
-            focus_id:          ['state', 'editor', 'sideBar', 'focus_id'],
-            project_id:        aProjectId,
-            project:           [...Data._.projects, sProjectId],
-            linePrice:         [...Data._.prices, iPriceId],
-            project_print_ids: Data._.project_prints
-        }
-    }
-
- * An optional method to override is the adjustStateFromCursor Method.  This method is essentially a hook that
- * allows you to modify the incoming data before it is set into the current component's state
- *
- * Example:
- *
-
-    adjustStateFromCursor(sKey, mNewData, oPreviousState) {
-        let oState = super.adjustStateFromCursor(sKey, mNewData);
-
-        switch(sKey) {
-            case 'project_print_ids':
-                const {
-                    project_id: sProjectId,
-                    linePrice:  oPricePerExtraLine
-                } = this.state;
-
-                oState[sKey]      = Object.keys(Data.objectFilter(oData, oPrint => oPrint.project_id == sProjectId));
-                oState.count      = oState[sKey].length;
-                oState.next_price = oState.count < oPricePerExtraLine.minimum ? 'FREE' : '$' + oPricePerExtraLine.amount;
-                break;
-        }
-
-        return oState;
-    }
-
- * Once these methods are in place, all your other methods should load their data from this.state.  In order to update the
+ * Once the stateQueries method is in place, all your other methods should load their data from this.state.  In order to update the
  * current component's state, you should _always_ update the Baobab Database.  If you have local state to manage, it's a good
  * idea to track that in your Baobab database as well.
  *
- *
- * All your cursors are stored in this.oCursors, which are Baobab Cursors.  So if you want to update something...
+ * All your cursors are stored in this.CURSORS, which are Baobab Cursors.  So if you want to update something...
 
-    this.oCursors.whataver.set('someValue');
+    this.CURSORS.whatever.set('someValue');
 
  * or
 
-    this.oCursors.something.merge({something: 'else'});
+    this.CURSORS.something.merge({something: 'else'});
 
  * Updating the cursor will re-render the current component because the current component's state will have changed.  As will
  * any other BaobabComponent that has been watching the same data.
+ *
+ * The baobab update methods are documented here: https://github.com/Yomguithereal/baobab#updates
  */
 
 export default class BaobabComponent extends React.Component {
     constructor(props, context) {
         super(props, context);
 
-        this.watch();
+        this._watch();
     }
 
+    /**
+     * This method should be overridden in your component.  It defines how the data will be retrieved and modified to
+     * generate the state of your component.
+     *
+     * Each property of the returned object is the name of the state variable that will be maintained.
+     * The value can be a simple baobab path or an object with more advanced settings.
+     *
+     * The available settings are:
+     *
+     * cursor:        A baobab path.  If it's set, then this.CURSORS[property] will have a cursor that you can modify in your component methods
+     * invokeRender: designates whether changes to this state property should invoke rendering of the current component
+     * setState:     this method will be run just before this.setState(oState) is called, allowing you to modify the values from the cursor before they are added to the local state
+     * onUpdate:     this method will be called _after_ the state has been updated, for each key that has been updated
+     *
+     *
+     * Example:
+     *
+
+     stateQueries() {
+        return {
+
+            column:  [ 'local', 'columns', this.props.id ],
+            name:    [ 'local', 'columns', this.props.id, 'name' ],
+            tables:   {
+                cursor:       ['local', 'tables'],
+                invokeRender: false,
+                setState:     oState => oState.table = oState.tables[oState.column.table_id]
+            },
+            columns: {
+                cursor:        [ 'local', 'columns' ],
+                invokeRender:  false,
+                setState:      oState => oState.table_columns = Object.values(oState.columns).filter(oColumn => oColumn.table_id == oState.column.table_id)
+            },
+            table_columns: {
+                invokeRender: false,
+                setState:     oState => oState.column_index  = oState.table_columns.findIndex(oColumn => oColumn.id == oState.column.id)
+            }
+        }
+    }
+     *
+     * @return {{string: [string,*]}} | {{string: {cursor: [string,*], invokeRender: boolean, setState: (function({}): {})}, onUpdate: (function({}): {})}}
+     */
     stateQueries() {
-        return {}
-    }
-
-    watch() {
-        this.oCursors = {};
-        this.oData    = {};
-        this.state    = {};
-
-        this.bWatch   = true;
-        this._oQueries = this.stateQueries();
-        this._refresh();
-
-        this.onWatcherData();
-        Data.Base.on('update', this._treeUpdate);
+        console.warn('You should override BaobabComponent.stateQueries');
+        return {};
     }
 
     addCursor(sKey, oQuery) {
@@ -104,27 +92,59 @@ export default class BaobabComponent extends React.Component {
         this._refresh();
     }
 
+    _watch() {
+        this.state   = {};
+        this.CURSORS = {};
+        this.oData   = {};
+
+        this.bWatch   = true;
+        this._oQueries = this.stateQueries();
+        this._refresh();
+
+        this._onWatcherData(); // Initialize
+        Data.Base.on('update', this._treeUpdate); // Watch
+    }
+
+    /**
+     * This method will get "update" events from ALL Baobab updates.
+     * We check if any of the updates are interesting to us, and if so, we process the new data.
+     * @param {Event} oEvent
+     * @private
+     */
     _treeUpdate = oEvent => {
         let aChangedPath = solveUpdate(oEvent.data.paths, this._aPaths);
         if (aChangedPath !== false) {
-            this.onWatcherData(oEvent);
+            this._onWatcherData(oEvent);
         }
     };
 
-    onWatcherData = oEvent => {
+    /**
+     * This is where all the magic happens.  First we grab the _current_ state, which is _after_ the Baobab tree has been updated
+     * and merge it with our local version of the data - but only in a state variable.  We're not overwriting our data yet.
+     *
+     * Then we loop through and run _processState on every one, which takes care of all adjustments and prepares and onUpdate calls, and so on
+     *
+     * When we'll check if anything NEW was created in our adjustments and loop through those as well.
+     *
+     * Finally, if anything non-passive has updated, let's update our local data and local state, which will fire a component Render
+     *
+     * @param {Event} oEvent
+     * @private
+     */
+    _onWatcherData = oEvent => {
         if (!this.bWatch) {
             return;
         }
 
         let oState = Object.assign({}, this.oData, this._getData());
         let aKeys  = new Set(Object.keys(oState));
-        let aAfter = [];
 
+        this.aAfter   = [];
         this.bChanged = false;
         // this.aChanged = []; // For Tracking and Debugging
 
         for (let sKey in oState) {
-            this._processState(oState, sKey, aAfter);
+            this._processState(oState, sKey);
         }
 
         // Process anything new created by processing state
@@ -133,16 +153,17 @@ export default class BaobabComponent extends React.Component {
             let aNewKeys = new Set([ ...aCheckForNewKeys ].filter(x => !aKeys.has(x)));
             if (aNewKeys.size > 0) {
                 for (let sKey of aNewKeys) {
-                    this._processState(oState, sKey, aAfter);
+                    this._processState(oState, sKey);
                 }
             }
         }
 
-        if (this.bChanged) {
-            //console.log('CHANGED', this.constructor.name, this.aChanged, oEvent, aAfter);
+        this.oData = oState;
 
-            let fDone  = () => aAfter.map(fAfter => fAfter(oState));
-            this.oData = oState;
+        if (this.bChanged) {
+            //console.log('CHANGED', this.constructor.name, this.aChanged, oEvent, this.aAfter);
+
+            let fDone  = () => this.aAfter.map(fAfter => fAfter(oState));
 
             if (oEvent) { // Handler
                 this.setState(oState, fDone);
@@ -153,11 +174,17 @@ export default class BaobabComponent extends React.Component {
         }
     };
 
-    _processState = (oState, sKey, aAfter) => {
+    /**
+     *
+     * @param {Object} oState The Currently Modified State Object, which is being actively modified
+     * @param {String} sKey   The Key we're currently modifying
+     * @private
+     */
+    _processState = (oState, sKey) => {
         let bKeyDataChanged = oState[sKey] != this.oData[sKey];
 
-        if (bKeyDataChanged && this._bAdjusted && this._oAdjusted[ sKey ] !== undefined) {
-            this._oAdjusted[ sKey ].adjust(oState);
+        if (bKeyDataChanged && this._bBefore && this._oBefore[ sKey ] !== undefined) {
+            this._oBefore[ sKey ].setState(oState);
         }
 
         if (this._bPassive && this._oPassive[sKey] !== undefined) {
@@ -166,8 +193,8 @@ export default class BaobabComponent extends React.Component {
             this.bChanged = true;
             // this.aChanged.push(sKey); // For Tracking and Debugging
 
-            if (this._bAfter && this._oAfter[sKey] !== undefined) {
-                aAfter.push(this._oAfter[sKey].after);
+            if (this._bAfter && this._oAfter[sKey] !== undefined) { // We're not running onUpdate methods until after we've updated our state
+                this.aAfter.push(this._oAfter[sKey].after);
             }
         }
     };
@@ -185,19 +212,23 @@ export default class BaobabComponent extends React.Component {
     }
 
     onBoundInputChange = oEvent => {
-        this.oCursors[oEvent.target.name].set(oEvent.target.value);
+        this.CURSORS[oEvent.target.name].set(oEvent.target.value);
     };
 
+    /**
+     * Parse our Queries object and prepare our cursors and methods for action
+     * @private
+     */
     _refresh() {
-        this._bAdjusted = false;
-        this._bAfter    = false;
-        this._bPassive  = false;
+        this._bBefore = false;
+        this._bAfter   = false;
+        this._bPassive = false;
 
-        this._oPaths    = {};
-        this._oAdjusted = {};
-        this._oAfter    = {};
-        this._oPassive  = {};
-        this.oCursors   = {};
+        this._oPaths   = {};
+        this._oBefore  = {};
+        this._oAfter   = {};
+        this._oPassive = {};
+        this.CURSORS   = {};
 
         Object.keys(this._oQueries).map(sKey => {
             let mQuery    = this._oQueries[sKey];
@@ -207,22 +238,22 @@ export default class BaobabComponent extends React.Component {
             if (bIsPath) {
                 sPath     = mQuery;
             } else {
-                if (mQuery.path !== undefined) {
-                    sPath = mQuery.path
+                if (mQuery.cursor !== undefined) {
+                    sPath = mQuery.cursor
                 }
 
-                if (typeof mQuery.adjust == 'function') {
-                    this._oAdjusted[ sKey ] = mQuery;
-                    this._bAdjusted = true;
+                if (typeof mQuery.setState == 'function') {
+                    this._oBefore[ sKey ] = mQuery;
+                    this._bBefore = true;
                 }
 
-                if (typeof mQuery.after == 'function') {
+                if (typeof mQuery.onUpdate == 'function') {
                     this._oAfter[ sKey ] = mQuery;
                     this._bAfter = true;
                 }
 
                 // Only Watch Passive Paths
-                if (mQuery.passive !== undefined && mQuery.passive) {
+                if (mQuery.invokeRender !== undefined && mQuery.invokeRender === false) {
                     this._oPassive[ sKey ] = 1;
                     this._bPassive = true;
                 }
@@ -230,7 +261,7 @@ export default class BaobabComponent extends React.Component {
 
             if (sPath) {
                 this._oPaths[ sKey ]  = sPath;
-                this.oCursors[ sKey ] = Data.Base.select(sPath);
+                this.CURSORS[ sKey ] = Data.Base.select(sPath);
             }
 
         });
