@@ -19,6 +19,12 @@ export default class App extends BaobabComponent {
             projects: {
                 cursor:   [ 'local', 'projects' ],
                 setState: oState => oState.projects_array = Object.values(oState.projects)
+            },
+            focus:   {
+                cursor: [ 'state', 'www', 'focus' ],
+                onUpdate: oState => {
+                    console.log(oState.focus);
+                }
             }
         }
     }
@@ -63,6 +69,7 @@ export default class App extends BaobabComponent {
         };
 
         this.CURSORS.projects.set(oProject.id, oProject);
+        this.CURSORS.focus.set('project-' + oProject.id);
     };
 
     save = () => {

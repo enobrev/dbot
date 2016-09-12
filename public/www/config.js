@@ -25,6 +25,7 @@ System.config({
     "crossover": "npm:crossover@0.6.0",
     "css": "github:systemjs/plugin-css@0.1.27",
     "localforage": "npm:localforage@1.4.2",
+    "pluralize": "npm:pluralize@3.0.0",
     "react": "npm:react@15.3.1",
     "react-addons-shallow-compare": "npm:react-addons-shallow-compare@15.3.1",
     "react-dom": "npm:react-dom@15.3.1",

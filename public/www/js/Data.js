@@ -31,7 +31,8 @@ export default class Data {
         state:  {
             www: {
                 url_state: {},
-                component: null
+                component: null,
+                focus:     null
             }
         },
         props: {}
