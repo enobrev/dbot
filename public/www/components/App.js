@@ -17,8 +17,8 @@ export default class App extends BaobabComponent {
     stateQueries() {
         return {
             projects: {
-                path:   [ 'local', 'projects' ],
-                adjust: oState => oState.projects_array = Object.values(oState.projects)
+                cursor:   [ 'local', 'projects' ],
+                setState: oState => oState.projects_array = Object.values(oState.projects)
             }
         }
     }
@@ -62,7 +62,7 @@ export default class App extends BaobabComponent {
             name: ''
         };
 
-        this.oCursors.projects.set(oProject.id, oProject);
+        this.CURSORS.projects.set(oProject.id, oProject);
     };
 
     save = () => {

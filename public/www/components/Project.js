@@ -16,8 +16,8 @@ export default class Project extends BaobabComponent {
         return {
             name:   [ 'local', 'projects', this.props.id, 'name' ],
             tables: {
-                path:   [ 'local', 'tables' ],
-                adjust: oState => oState.project_tables = Object.values(oState.tables).filter(oTable => oTable.project_id == this.props.id)
+                cursor:   [ 'local', 'tables' ],
+                setState: oState => oState.project_tables = Object.values(oState.tables).filter(oTable => oTable.project_id == this.props.id)
             }
         }
     }
@@ -46,7 +46,7 @@ export default class Project extends BaobabComponent {
     }
 
     updateName = oEvent => {
-        this.oCursors.name.set(oEvent.target.value);
+        this.CURSORS.name.set(oEvent.target.value);
     };
 
     keyUp = oEvent => {
@@ -59,13 +59,13 @@ export default class Project extends BaobabComponent {
                     console.log('TODO: focus on first table');
                 } else {
                     let oNewTable = LocalData.newTable(this.props.id);
-                    this.oCursors.tables.set(oNewTable.id, oNewTable);
+                    this.CURSORS.tables.set(oNewTable.id, oNewTable);
                 }
                 break;
 
             case 8: // BACKSPACE
                 if (sName.length == 0) {
-                    this.oCursors.name.up().unset();
+                    this.CURSORS.name.up().unset();
 
                     console.log('TODO: Focus on Previous Table or Project');
                 }

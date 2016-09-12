@@ -17,12 +17,12 @@ export default class Table extends BaobabComponent {
             table:  [ 'local', 'tables', this.props.id ],
             name:   [ 'local', 'tables', this.props.id, 'name' ],
             columns: {
-                path:    [ 'local', 'columns' ],
-                passive: true,
-                adjust:  oState => oState.table_columns = Object.values(oState.columns).filter(oTable => oTable.table_id == this.props.id)
+                cursor:    [ 'local', 'columns' ],
+                invokeRender: true,
+                setState:  oState => oState.table_columns = Object.values(oState.columns).filter(oTable => oTable.table_id == this.props.id)
             },
             table_columns: {
-                adjust: oState => oState.show = oState.table_columns.length > 0
+                setState: oState => oState.show = oState.table_columns.length > 0
             }
         }
     }
@@ -54,7 +54,7 @@ export default class Table extends BaobabComponent {
     }
 
     updateName = oEvent => {
-        this.oCursors.name.set(oEvent.target.value);
+        this.CURSORS.name.set(oEvent.target.value);
     };
 
     keyUp = oEvent => {
@@ -71,13 +71,13 @@ export default class Table extends BaobabComponent {
                     console.log('TODO: focus on first column');
                 } else {
                     let oNewColumn = LocalData.newColumn(oTable.id);
-                    this.oCursors.columns.set(oNewColumn.id, oNewColumn);
+                    this.CURSORS.columns.set(oNewColumn.id, oNewColumn);
                 }
                 break;
 
             case 8: // BACKSPACE
                 if (sName.length == 0) {
-                    this.oCursors.table.unset();
+                    this.CURSORS.table.unset();
 
                     console.log('TODO: Focus on Previous Table or Project');
                 }

@@ -51,7 +51,7 @@ export default class Column extends BaobabComponent {
     }
 
     updateName = oEvent => {
-        this.oCursors.name.set(oEvent.target.value);
+        this.CURSORS.name.set(oEvent.target.value);
     };
 
     onKeyDown = oEvent => {
@@ -62,18 +62,18 @@ export default class Column extends BaobabComponent {
                 if (sName.length) {
                     let oNewColumn = LocalData.newColumn(oTable.id);
                     console.log('New Column', oNewColumn)
-                    this.oCursors.column.up().set(oNewColumn.id, oNewColumn);
+                    this.CURSORS.column.up().set(oNewColumn.id, oNewColumn);
                 } else {
                     let oNewTable = LocalData.newTable(oTable.project_id);
 
-                    this.oCursors.column.unset();
-                    this.oCursors.tables.set(oNewTable.id, oNewTable);
+                    this.CURSORS.column.unset();
+                    this.CURSORS.tables.set(oNewTable.id, oNewTable);
                 }
                 break;
 
             case 8: // BACKSPACE
                 if (sName.length == 0) {
-                    this.oCursors.column.unset();
+                    this.CURSORS.column.unset();
 
                     // Remember that aColumns is outdated at this point because that "unset" has not taken yet
                     if (aColumns.length > 1) {
