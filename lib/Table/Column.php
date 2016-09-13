@@ -66,8 +66,8 @@
         /** @var Field\TextNullable column_default **/
         public $column_default;
 
-        /** @var Field\Boolean column_null **/
-        public $column_null;
+        /** @var Field\Boolean column_nullable **/
+        public $column_nullable;
 
         /** @var Field\Boolean column_primary **/
         public $column_primary;
@@ -77,6 +77,9 @@
 
         /** @var Field\Boolean column_auto_increment **/
         public $column_auto_increment;
+
+        /** @var Field\Boolean column_unsigned **/
+        public $column_unsigned;
 
         /** @var Field\DateTime column_date_added **/
         public $column_date_added;
@@ -103,16 +106,22 @@
                 new Field\Integer('column_length'),
                 new Field\TextNullable('column_values'),
                 new Field\TextNullable('column_default'),
-                new Field\Boolean('column_null'),
+                new Field\Boolean('column_nullable'),
                 new Field\Boolean('column_primary'),
                 new Field\Boolean('column_unique'),
                 new Field\Boolean('column_auto_increment'),
+                new Field\Boolean('column_unsigned'),
                 new Field\DateTime('column_date_added'),
                 new Field\DateTime('column_date_updated')
             );
 
             $this->reference_delete->setDefault(self::DELETE_CASCADE);
             $this->reference_update->setDefault(self::UPDATE_CASCADE);
+            $this->column_nullable->setDefault(1);
+            $this->column_primary->setDefault(0);
+            $this->column_unique->setDefault(0);
+            $this->column_auto_increment->setDefault(0);
+            $this->column_unsigned->setDefault(0);
 
             $this->table_id->references('tables', 'table_id');
             $this->reference_column_id->references('columns', 'column_id');
@@ -140,8 +149,8 @@
         /**
          * @return bool
          */
-        public function isNull() {
-            return $this->column_null->isTrue();
+        public function isNullable() {
+            return $this->column_nullable->isTrue();
         }
 
         /**
@@ -163,6 +172,13 @@
          */
         public function isAuto_increment() {
             return $this->column_auto_increment->isTrue();
+        }
+
+        /**
+         * @return bool
+         */
+        public function isUnsigned() {
+            return $this->column_unsigned->isTrue();
         }
 
         /**

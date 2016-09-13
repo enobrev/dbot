@@ -19,14 +19,11 @@
         /** @var Field\TextNullable column_type_php **/
         public $column_type_php;
 
-        /** @var Field\TextNullable column_type_javascript **/
-        public $column_type_javascript;
-
         /** @var Field\Boolean column_type_unsigned **/
         public $column_type_unsigned;
 
-        /** @var Field\Boolean column_type_null **/
-        public $column_type_null;
+        /** @var Field\Boolean column_type_nullable **/
+        public $column_type_nullable;
 
         /** @var Field\Boolean column_type_primary **/
         public $column_type_primary;
@@ -45,14 +42,17 @@
                 new Field\TextNullable('column_type_name'),
                 new Field\TextNullable('column_type_mysql'),
                 new Field\TextNullable('column_type_php'),
-                new Field\TextNullable('column_type_javascript'),
                 new Field\Boolean('column_type_unsigned'),
-                new Field\Boolean('column_type_null'),
+                new Field\Boolean('column_type_nullable'),
                 new Field\Boolean('column_type_primary'),
                 new Field\Boolean('column_type_auto_increment'),
                 new Field\Integer('column_type_length')
             );
 
+            $this->column_type_unsigned->setDefault(0);
+            $this->column_type_nullable->setDefault(0);
+            $this->column_type_primary->setDefault(0);
+            $this->column_type_auto_increment->setDefault(0);
         }
 
         /**
@@ -83,8 +83,8 @@
         /**
          * @return bool
          */
-        public function isNull() {
-            return $this->column_type_null->isTrue();
+        public function isNullable() {
+            return $this->column_type_nullable->isTrue();
         }
 
         /**
