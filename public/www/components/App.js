@@ -24,7 +24,7 @@ export default class App extends BaobabComponent {
             },
             column_types: {
                 cursor:  [ 'local', 'column_types'],
-                setState: oState => oState.types = Object.values(oState.column_types)
+                setState: oState => oState.types = Data.sortObjectBy(oState.column_types, 'date_added')
             },
             focus:   {
                 cursor: [ 'state', 'www', 'focus' ],

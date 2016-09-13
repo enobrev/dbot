@@ -19,18 +19,31 @@ export default class Project extends BaobabComponent {
                 cursor:   [ 'local', 'tables' ],
                 setState: oState => oState.project_tables = Object.values(oState.tables).filter(oTable => oTable.project_id == this.props.id)
             },
-            focus:   {
-                cursor: [ 'state', 'www', 'focus' ],
-                setState: oState => oState.stealFocus = oState.focus == 'project-' + oState.type.id,
-                onUpdate: oState => oState.stealFocus && this.refs.input && this.refs.input.focus()
+            focus:        {
+                cursor:   [ 'state', 'www', 'focus' ],
+                setState: oState => oState.stealFocus = oState.focus
+                                                     && oState.focus.type == 'project'
+                                                     && oState.focus.id   == this.props.id
+            },
+            stealFocus: {
+                setState: oState => {
+                    this.stealFocus(oState);
+                }
             }
         }
     }
 
-    componentDidMount() {
-        if (this.state.stealFocus) {
-            this.refs.input.focus();
+    stealFocus(oState) {
+        if (oState.stealFocus) {
+            let oRef = this.refs[oState.focus.ref] || this.refs.name;
+            if (oRef) {
+                oRef.focus();
+            }
         }
+    };
+
+    componentDidMount() {
+        this.stealFocus(this.state);
     }
 
     render() {
@@ -43,7 +56,7 @@ export default class Project extends BaobabComponent {
             <div className="ui segment">
                 <form className="ui form" onSubmit={oEvent => oEvent.preventDefault()}>
                     <div className="header basic field">
-                        <input type="text" ref="input" name="name" value={sName} placeholder="Project Name" onChange={this.updateName} onKeyDown={this.onKeyDown} />
+                        <input type="text" ref="name" name="name" value={sName} placeholder="Project Name" onChange={this.updateName} onKeyDown={this.onKeyDown} />
                     </div>
                 </form>
 
@@ -63,11 +76,17 @@ export default class Project extends BaobabComponent {
             case 13: // ENTER
                 if (aTables.length) {
                     // Focus on the first one
-                    this.CURSORS.focus.set('table-' + aTables[0].id);
+                    this.CURSORS.focus.set({
+                        type:  'table',
+                        id:    aTables[0]
+                    });
                 } else {
                     let oNewTable = LocalData.newTable(this.props.id);
                     this.CURSORS.tables.set(oNewTable.id, oNewTable);
-                    this.CURSORS.focus.set('table-' + oNewTable.id);
+                    this.CURSORS.focus.set({
+                        type:  'table',
+                        id:    oNewTable.id
+                    });
                 }
                 break;
 

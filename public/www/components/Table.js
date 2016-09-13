@@ -27,18 +27,31 @@ export default class Table extends BaobabComponent {
             table_columns: {
                 setState: oState => oState.show = oState.table_columns.length > 0
             },
-            focus:         {
+            focus:        {
                 cursor:   [ 'state', 'www', 'focus' ],
-                setState: oState => oState.stealFocus = oState.focus == 'table-' + oState.type.id,
-                onUpdate: oState => oState.stealFocus && this.refs.input && this.refs.input.focus()
+                setState: oState => oState.stealFocus = oState.focus
+                                                     && oState.focus.type == 'table'
+                                                     && oState.focus.id   == this.props.id
+            },
+            stealFocus: {
+                setState: oState => {
+                    this.stealFocus(oState);
+                }
             }
         }
     }
 
-    componentDidMount() {
-        if (this.state.stealFocus) {
-            this.refs.name.focus();
+    stealFocus(oState) {
+        if (oState.stealFocus) {
+            let oRef = this.refs[oState.focus.ref] || this.refs.name;
+            if (oRef) {
+                oRef.focus();
+            }
         }
+    };
+
+    componentDidMount() {
+        this.stealFocus(this.state);
     }
 
     render() {
@@ -155,11 +168,17 @@ export default class Table extends BaobabComponent {
         switch(oEvent.keyCode) {
             case 13: // ENTER
                 if (aColumns.length) {
-                    this.CURSORS.focus.set('column-' + aColumns[0].id);
+                    this.CURSORS.focus.set({
+                        type:  'column',
+                        id:    aColumns[0].id
+                    });
                 } else {
                     let oNewColumn = LocalData.newColumn(oTable.id);
                     this.CURSORS.columns.set(oNewColumn.id, oNewColumn);
-                    this.CURSORS.focus.set('column-' + oNewColumn.id);
+                    this.CURSORS.focus.set({
+                        type:  'column',
+                        id:    oNewColumn.id
+                    });
                 }
                 break;
 

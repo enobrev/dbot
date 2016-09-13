@@ -117,7 +117,7 @@
 
             $this->reference_delete->setDefault(self::DELETE_CASCADE);
             $this->reference_update->setDefault(self::UPDATE_CASCADE);
-            $this->column_nullable->setDefault(1);
+            $this->column_nullable->setDefault(0);
             $this->column_primary->setDefault(0);
             $this->column_unique->setDefault(0);
             $this->column_auto_increment->setDefault(0);

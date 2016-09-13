@@ -18,7 +18,7 @@
                 "enum": 0,
                 "primary": 1,
                 "unique": 0,
-                "boolean": 4
+                "boolean": 2
             },
             "m2m": false,
             "has_owner": false,
@@ -51,8 +51,8 @@
                             "subclass": "Columns"
                         }
                     },
-                    "short_pad": "            ",
-                    "name_pad": "            "
+                    "short_pad": "      ",
+                    "name_pad": "      "
                 },
                 {
                     "short": "name",
@@ -69,26 +69,8 @@
                     "type": "Field\\TextNullable",
                     "qltype": "string",
                     "php_type": "string",
-                    "short_pad": "          ",
-                    "name_pad": "          "
-                },
-                {
-                    "short": "mysql",
-                    "short_title": "Mysql",
-                    "name": "column_type_mysql",
-                    "title": "ColumnTypeMysql",
-                    "primary": false,
-                    "unique": false,
-                    "boolean": false,
-                    "nullable": true,
-                    "var": "sColumnTypeMysql",
-                    "default": null,
-                    "comment": "",
-                    "type": "Field\\TextNullable",
-                    "qltype": "string",
-                    "php_type": "string",
-                    "short_pad": "         ",
-                    "name_pad": "         "
+                    "short_pad": "    ",
+                    "name_pad": "    "
                 },
                 {
                     "short": "php",
@@ -105,80 +87,26 @@
                     "type": "Field\\TextNullable",
                     "qltype": "string",
                     "php_type": "string",
-                    "short_pad": "           ",
-                    "name_pad": "           "
+                    "short_pad": "     ",
+                    "name_pad": "     "
                 },
                 {
-                    "short": "unsigned",
-                    "short_title": "Unsigned",
-                    "name": "column_type_unsigned",
-                    "title": "ColumnTypeUnsigned",
+                    "short": "mysql",
+                    "short_title": "Mysql",
+                    "name": "column_type_mysql",
+                    "title": "ColumnTypeMysql",
                     "primary": false,
                     "unique": false,
-                    "boolean": true,
+                    "boolean": false,
                     "nullable": true,
-                    "var": "bColumnTypeUnsigned",
-                    "default": "0",
+                    "var": "sColumnTypeMysql",
+                    "default": null,
                     "comment": "",
-                    "type": "Field\\Boolean",
-                    "qltype": "bool",
-                    "php_type": "bool",
-                    "short_pad": "      ",
-                    "name_pad": "      "
-                },
-                {
-                    "short": "nullable",
-                    "short_title": "Nullable",
-                    "name": "column_type_nullable",
-                    "title": "ColumnTypeNullable",
-                    "primary": false,
-                    "unique": false,
-                    "boolean": true,
-                    "nullable": true,
-                    "var": "bColumnTypeNullable",
-                    "default": "0",
-                    "comment": "",
-                    "type": "Field\\Boolean",
-                    "qltype": "bool",
-                    "php_type": "bool",
-                    "short_pad": "      ",
-                    "name_pad": "      "
-                },
-                {
-                    "short": "primary",
-                    "short_title": "Primary",
-                    "name": "column_type_primary",
-                    "title": "ColumnTypePrimary",
-                    "primary": false,
-                    "unique": false,
-                    "boolean": true,
-                    "nullable": true,
-                    "var": "bColumnTypePrimary",
-                    "default": "0",
-                    "comment": "",
-                    "type": "Field\\Boolean",
-                    "qltype": "bool",
-                    "php_type": "bool",
-                    "short_pad": "       ",
-                    "name_pad": "       "
-                },
-                {
-                    "short": "auto_increment",
-                    "short_title": "Auto_increment",
-                    "name": "column_type_auto_increment",
-                    "title": "ColumnTypeAutoIncrement",
-                    "primary": false,
-                    "unique": false,
-                    "boolean": true,
-                    "nullable": true,
-                    "var": "bColumnTypeAutoIncrement",
-                    "default": "0",
-                    "comment": "",
-                    "type": "Field\\Boolean",
-                    "qltype": "bool",
-                    "php_type": "bool",
-                    "short_pad": "",
-                    "name_pad": ""
+                    "type": "Field\\TextNullable",
+                    "qltype": "string",
+                    "php_type": "string",
+                    "short_pad": "   ",
+                    "name_pad": "   "
                 },
                 {
                     "short": "length",
@@ -195,15 +123,51 @@
                     "type": "Field\\Integer",
                     "qltype": "int",
                     "php_type": "int",
-                    "short_pad": "        ",
-                    "name_pad": "        "
+                    "short_pad": "  ",
+                    "name_pad": "  "
+                },
+                {
+                    "short": "unsigned",
+                    "short_title": "Unsigned",
+                    "name": "column_type_unsigned",
+                    "title": "ColumnTypeUnsigned",
+                    "primary": false,
+                    "unique": false,
+                    "boolean": true,
+                    "nullable": true,
+                    "var": "bColumnTypeUnsigned",
+                    "default": "0",
+                    "comment": "",
+                    "type": "Field\\Boolean",
+                    "qltype": "bool",
+                    "php_type": "bool",
+                    "short_pad": "",
+                    "name_pad": ""
+                },
+                {
+                    "short": "nullable",
+                    "short_title": "Nullable",
+                    "name": "column_type_nullable",
+                    "title": "ColumnTypeNullable",
+                    "primary": false,
+                    "unique": false,
+                    "boolean": true,
+                    "nullable": true,
+                    "var": "bColumnTypeNullable",
+                    "default": "0",
+                    "comment": "",
+                    "type": "Field\\Boolean",
+                    "qltype": "bool",
+                    "php_type": "bool",
+                    "short_pad": "",
+                    "name_pad": ""
                 }
             ],
             "types": [
                 "UUID",
                 "TextNullable",
-                "Boolean",
-                "Integer"
+                "Integer",
+                "Boolean"
             ],
             "primary": [
                 {
@@ -665,7 +629,7 @@
                     "boolean": true,
                     "nullable": true,
                     "var": "bColumnNullable",
-                    "default": "1",
+                    "default": "0",
                     "comment": "",
                     "type": "Field\\Boolean",
                     "qltype": "bool",

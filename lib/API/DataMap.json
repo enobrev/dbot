@@ -7,15 +7,13 @@
         "tables": "Table"
     },
     "column_types": {
-        "id"            : "column_type_id",
-        "name"          : "column_type_name",
-        "mysql"         : "column_type_mysql",
-        "php"           : "column_type_php",
-        "unsigned"      : "column_type_unsigned",
-        "nullable"      : "column_type_nullable",
-        "primary"       : "column_type_primary",
-        "auto_increment": "column_type_auto_increment",
-        "length"        : "column_type_length"
+        "id"      : "column_type_id",
+        "name"    : "column_type_name",
+        "php"     : "column_type_php",
+        "mysql"   : "column_type_mysql",
+        "length"  : "column_type_length",
+        "unsigned": "column_type_unsigned",
+        "nullable": "column_type_nullable"
     },
     "columns": {
         "id"              : "column_id",

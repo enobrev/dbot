@@ -214,7 +214,7 @@ export default class BaobabComponent extends React.Component {
         return shallowCompare(this, oNextProps, oNextState);
     }
 
-    onBoundInputChange = oEvent => {
+    onBoundInputChange(oEvent) {
         this.CURSORS[oEvent.target.name].set(oEvent.target.value);
     };
 

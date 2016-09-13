@@ -5,6 +5,7 @@ import React, { PropTypes } from "react";
 import BaobabComponent from './BaobabComponent';
 import Checkbox from './Checkbox';
 
+import Data from '../js/Data';
 import LocalData from '../js/LocalData';
 
 export default class Type extends BaobabComponent {
@@ -20,24 +21,39 @@ export default class Type extends BaobabComponent {
             column_types: {
                 cursor:       [ 'local', 'column_types' ],
                 invokeRender: false,
-                setState:     oState => oState.types = Object.values(oState.column_types)
+                setState:     oState => oState.types = Data.sortObjectBy(oState.column_types, 'date_added')
             },
             types:        {
-                invokeRender: true,
+                invokeRender: false,
                 setState:     oState =>  oState.type_index = oState.types.findIndex(oType => oType.id == this.props.id)
             },
             focus:        {
+                invokeRender: false,
                 cursor:   [ 'state', 'www', 'focus' ],
-                setState: oState => oState.stealFocus = oState.focus == 'type-' + oState.type.id,
-                onUpdate: oState => oState.stealFocus && this.refs.name && this.refs.name.focus()
+                setState: oState => oState.stealFocus = oState.focus
+                                                     && oState.focus.type == 'type'
+                                                     && oState.focus.id   == this.props.id
+            },
+            stealFocus: {
+                invokeRender: false,
+                setState: oState => {
+                    this.stealFocus(oState);
+                }
             }
         }
     }
 
-    componentDidMount() {
-        if (this.state.stealFocus) {
-            this.refs.name.focus();
+    stealFocus(oState) {
+        if (oState.stealFocus) {
+            let oRef = this.refs[oState.focus.ref] || this.refs.name;
+            if (oRef) {
+                oRef.focus();
+            }
         }
+    };
+
+    componentDidMount() {
+        this.stealFocus(this.state);
     }
 
     render() {
@@ -45,24 +61,22 @@ export default class Type extends BaobabComponent {
 
         return (
             <form className="ui form" onSubmit={oEvent => oEvent.preventDefault()}>
-                <div className="ui eight fields">
+                <div className="ui six fields">
                     <div className="field">
-                        <input ref="name"           name="name"           value={oType.name}            placeholder="Name"           onChange={this.updateProperty} onKeyDown={this.onKeyDown} />
+                        <input ref="name"   name="name"   value={oType.name}   placeholder="Name"   onChange={this.updateProperty} onKeyDown={this.onKeyDown} />
                     </div>
                     <div className="field">
-                        <input ref="php"            name="php"            value={oType.php}             placeholder="PHP"            onChange={this.updateProperty} />
+                        <input ref="php"    name="php"    value={oType.php}    placeholder="PHP"    onChange={this.updateProperty} onKeyDown={this.onKeyDown} />
                     </div>
                     <div className="field">
-                        <input ref="mysql"          name="mysql"          value={oType.mysql}           placeholder="MySQL"          onChange={this.updateProperty} />
+                        <input ref="mysql"  name="mysql"  value={oType.mysql}  placeholder="MySQL"  onChange={this.updateProperty} onKeyDown={this.onKeyDown} />
                     </div>
                     <div className="field">
-                        <input ref="length"         name="length"         value={oType.length}          placeholder="Length"         onChange={this.updateProperty} />
+                        <input ref="length" name="length" value={oType.length} placeholder="Length" onChange={this.updateProperty} onKeyDown={this.onKeyDown} />
                     </div>
 
                     <Checkbox name="unsigned"        checked={oType.unsigned}       label="Unsigned"       onChange={this.checkedProperty} />
                     <Checkbox name="nullable"        checked={oType.nullable}       label="Nullable"       onChange={this.checkedProperty} />
-                    <Checkbox name="primary"         checked={oType.primary}        label="Primary"        onChange={this.checkedProperty} />
-                    <Checkbox name="auto_increment"  checked={oType.auto_increment} label="Auto Increment" onChange={this.checkedProperty} />
 
                 </div>
             </form>
@@ -91,16 +105,20 @@ export default class Type extends BaobabComponent {
         } = this.state;
 
         const iName = oType.name ? oType.name.length : 0;
+        let oFocus = {
+            type:  'type',
+            ref:   oEvent.target.name
+        };
 
         switch(oEvent.keyCode) {
             case 13: // ENTER
                 if (iName) {
                     if (aTypes.length > iIndex + 1) {
-                        this.CURSORS.focus.set('type-' + aTypes[ iIndex + 1 ].id);
+                        oFocus.id = aTypes[ iIndex + 1 ].id;
                     } else {
                         let oNewType = LocalData.newColumnType();
                         this.CURSORS.type.up().set(oNewType.id, oNewType);
-                        this.CURSORS.focus.set('type-' + oNewType.id);
+                        oFocus.id = oNewType.id;
                     }
                 }
                 break;
@@ -111,16 +129,18 @@ export default class Type extends BaobabComponent {
 
                     // Remember that aTypes is outdated at this point because that "unset" has not taken yet
                     if (aTypes.length > 1) {
-                        if (iIndex < aTypes.length - 1) {
-                            this.CURSORS.focus.set('type-' + aTypes[ iIndex + 1 ].id);
+                        if (iIndex + 1 < aTypes.length) {
+                            oFocus.id = aTypes[ iIndex + 1 ].id;
                         } else {
-                            this.CURSORS.focus.set('type-' + aTypes[ iIndex - 1 ].id);
+                            oFocus.id = aTypes[ iIndex - 1 ].id;
                         }
                     }
                 }
                 break;
+        }
 
-
+        if (oFocus.id) {
+            this.CURSORS.focus.set(oFocus);
         }
     }
 }

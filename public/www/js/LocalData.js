@@ -1,5 +1,6 @@
 "use strict";
 
+import moment from 'moment';
 import UUID from '../js/UUID';
 
 // Stupid name.  Ideally this will be an extension of Data.js and then just adds functionality
@@ -10,7 +11,8 @@ export default class LocalData {
     static newProject() {
         return {
             id:         UUID(),
-            name:       ''
+            name:       '',
+            date_added: moment().format('YYYY-MM-DD HH:mm:ss')
         };
     }
 
@@ -18,7 +20,8 @@ export default class LocalData {
         return {
             id:         UUID(),
             project_id: iProjectId,
-            name:       ''
+            name:       '',
+            date_added: moment().format('YYYY-MM-DD HH:mm:ss')
         };
     }
 
@@ -26,14 +29,16 @@ export default class LocalData {
         return {
             id:         UUID(),
             table_id:   iTableId,
-            name:       ''
+            name:       '',
+            date_added: moment().format('YYYY-MM-DD HH:mm:ss')
         };
     }
 
     static newColumnType() {
         return {
             id:         UUID(),
-            name:       ''
+            name:       '',
+            date_added: moment().format('YYYY-MM-DD HH:mm:ss')
         };
     }
 }
