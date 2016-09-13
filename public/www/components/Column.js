@@ -17,8 +17,12 @@ export default class Column extends BaobabComponent {
 
     stateQueries() {
         return {
-            column:        [ 'local', 'columns', this.props.id ],
-            show:          [ 'state', 'www', 'column', this.props.id, 'show' ],
+            column:        {
+                cursor: [ 'local', 'columns', this.props.id ],
+                setState: oState => {
+                    this.addCursor('show_names', [ 'state', 'www', 'table', oState.column.table_id, 'open' ]);
+                }
+            },
             tables:        {
                 cursor:       [ 'local', 'tables' ],
                 invokeRender: false,
@@ -83,24 +87,13 @@ export default class Column extends BaobabComponent {
     }
 
     render() {
-        const { show: sShow } = this.state;
+        const { show_names: bShow } = this.state;
 
-        switch(sShow) {
-            default:
-            case 'DETAILS': return this.renderDetails(); break;
-            case 'NAMES':   return this.renderNames();   break;
+        if (bShow) {
+            return this.renderNames();
         }
-    }
 
-    renderButtons() {
-        const { show: sShow } = this.state;
-
-        return (
-            <div className="ui field two buttons">
-                <div className={ClassNames("ui button", {disabled: sShow == 'DETAILS' || !sShow})} onClick={this.openDetails}>D</div>
-                <div className={ClassNames("ui button", {disabled: sShow == 'NAMES'})}   onClick={this.openNames}>N</div>
-            </div>
-        )
+        return this.renderDetails();
     }
 
     renderNameShort() {
@@ -118,9 +111,8 @@ export default class Column extends BaobabComponent {
 
         return (
             <form key="details" className="ui form" onSubmit={oEvent => oEvent.preventDefault()}>
-                <div className="ui nine fields">
+                <div className="ui eight fields">
                     {this.renderNameShort()}
-                    {this.renderButtons()}
 
                     <div className="field">
                         <select ref="type" name="type" className="ui fluid search dropdown" value={oColumn.type_id}>
@@ -191,9 +183,8 @@ export default class Column extends BaobabComponent {
 
         return (
             <form key="names" className="ui form" onSubmit={oEvent => oEvent.preventDefault()}>
-                <div className="ui seven fields">
+                <div className="ui six fields">
                     {this.renderNameShort()}
-                    {this.renderButtons()}
 
                     <div className="field">
                         <input ref="name"              name="name"             value={oColumn.name}             placeholder="Name"             onChange={this.updateProperty} />
@@ -305,14 +296,6 @@ export default class Column extends BaobabComponent {
     updateDefault(sValue) {
         this.CURSORS.column.merge({default: sValue});
     }
-
-    openDetails = () => {
-        this.CURSORS.show.set('DETAILS');
-    };
-
-    openNames = () => {
-        this.CURSORS.show.set('NAMES');
-    };
 
     onKeyDown = oEvent => {
         const {

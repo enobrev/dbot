@@ -30,6 +30,7 @@ export default class Data {
         },
         state:  {
             www: {
+                tab:       'projects',
                 url_state: {},
                 component: null,
                 focus:     null,
