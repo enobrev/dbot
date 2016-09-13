@@ -8,19 +8,19 @@ export default class API {
     static _base_url = API_BASE_URL;
 
     static setToken(sToken) {
-        this._token = sToken;
+        API._token = sToken;
     }
 
     static hasToken() {
-        return this._token !== null;
+        return API._token !== null;
     }
 
     static setBaseUrl(sUrl) {
-        this._base_url = sUrl;
+        API._base_url = sUrl;
     }
 
     static _getUrl(sEndpoint) {
-        if (!this._base_url) {
+        if (!API._base_url) {
             throw new Error('API_BASE_URL has not been defined');
         }
 
@@ -30,66 +30,66 @@ export default class API {
             sEndpoint = sEndpoint.substr(1); // strip leading slash
         }
 
-        return this._base_url + sEndpoint;
+        return API._base_url + sEndpoint;
     }
 
     static _getHeaders (oHeaders = {}) {
-        if (this._token) {
-            oHeaders['Authorization'] = 'Bearer: ' + this._token;
+        if (API._token) {
+            oHeaders['Authorization'] = 'Bearer: ' + API._token;
         }
 
         return oHeaders;
     }
 
     static get (sEndpoint, fCallback) {
-        fetch(this._getUrl(sEndpoint), {
+        fetch(API._getUrl(sEndpoint), {
             method: 'GET',
             mode: 'cors',
-            headers: this._getHeaders({
+            headers: API._getHeaders({
                 'Accept':       'application/json'
             })
         })
-            .then(oResponse => { this._respond(oResponse, fCallback); })
+            .then(oResponse => { API._respond(oResponse, fCallback); })
             .catch(fCallback);
     }
 
     static put (sEndpoint, oData, fCallback) {
-        fetch(this._getUrl(sEndpoint), {
+        fetch(API._getUrl(sEndpoint), {
             method: 'PUT',
             mode: 'cors',
-            headers: this._getHeaders({
+            headers: API._getHeaders({
                 'Accept':       'application/json',
                 'Content-Type': 'application/json'
             }),
             body: JSON.stringify(oData)
         })
-            .then(oResponse => { this._respond(oResponse, fCallback); })
+            .then(oResponse => { API._respond(oResponse, fCallback); })
             .catch(fCallback);
     }
 
     static del (sEndpoint, fCallback) {
-        fetch(this._getUrl(sEndpoint), {
+        fetch(API._getUrl(sEndpoint), {
             method: 'DELETE',
             mode: 'cors',
-            headers: this._getHeaders({
+            headers: API._getHeaders({
                 'Accept':       'application/json'
             }),
         })
-            .then(oResponse => { this._respond(oResponse, fCallback); })
+            .then(oResponse => { API._respond(oResponse, fCallback); })
             .catch(fCallback);
     }
 
     static post (sEndpoint, oData, fCallback) {
-        fetch(this._getUrl(sEndpoint), {
+        fetch(API._getUrl(sEndpoint), {
             method: 'POST',
             mode: 'cors',
-            headers: this._getHeaders({
+            headers: API._getHeaders({
                 'Accept':       'application/json',
                 'Content-Type': 'application/json'
             }),
             body: JSON.stringify(oData)
         })
-            .then(oResponse => { this._respond(oResponse, fCallback); })
+            .then(oResponse => { API._respond(oResponse, fCallback); })
             .catch(fCallback);
     }
 
@@ -105,13 +105,13 @@ export default class API {
         Object.keys(oData).map( sKey  => oFormData.append(sKey,        oData[sKey]            ));
         aFiles.map(             oFile => oFormData.append(oFile.field, oFile,      oFile.name ));
 
-        fetch(this._getUrl(sEndpoint), {
+        fetch(API._getUrl(sEndpoint), {
             method:  'POST',
             mode: 'cors',
-            headers: this._getHeaders(),
+            headers: API._getHeaders(),
             body:    oFormData
         })
-            .then(oResponse => { this._respond(oResponse, fCallback); })
+            .then(oResponse => { API._respond(oResponse, fCallback); })
             .catch(fCallback);
     }
 

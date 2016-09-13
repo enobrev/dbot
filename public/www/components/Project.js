@@ -21,10 +21,15 @@ export default class Project extends BaobabComponent {
             },
             focus:   {
                 cursor: [ 'state', 'www', 'focus' ],
-                setState: oState => {
-                    oState.stealFocus = oState.focus == 'project-' + this.props.id;
-                }
+                setState: oState => oState.stealFocus = oState.focus == 'project-' + oState.type.id,
+                onUpdate: oState => oState.stealFocus && this.refs.input && this.refs.input.focus()
             }
+        }
+    }
+
+    componentDidMount() {
+        if (this.state.stealFocus) {
+            this.refs.input.focus();
         }
     }
 
@@ -45,20 +50,6 @@ export default class Project extends BaobabComponent {
                 {aTables.map(oTable => <Table key={oTable.id} id={oTable.id} />)}
             </div>
         )
-    }
-
-    stealFocus() {
-        if (this.state.stealFocus) {
-            this.refs.input.focus();
-        }
-    }
-
-    componentDidMount() {
-        this.stealFocus();
-    }
-
-    componentDidUpdate() {
-        this.stealFocus();
     }
 
     updateName = oEvent => {

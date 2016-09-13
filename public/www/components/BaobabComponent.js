@@ -141,7 +141,7 @@ export default class BaobabComponent extends React.Component {
 
         this.aAfter   = [];
         this.bChanged = false;
-        // this.aChanged = []; // For Tracking and Debugging
+        this.aChanged = []; // For Tracking and Debugging
 
         for (let sKey in oState) {
             this._processState(oState, sKey);
@@ -158,19 +158,22 @@ export default class BaobabComponent extends React.Component {
             }
         }
 
+        //console.log('AFTER', this.constructor.name, this.aAfter);
+
         this.oData = oState;
+        let fDone = () => this.aAfter.map(sKey => this._oQueries[sKey].onUpdate(oState));
 
         if (this.bChanged) {
-            //console.log('CHANGED', this.constructor.name, this.aChanged, oEvent, this.aAfter);
-
-            let fDone  = () => this.aAfter.map(fAfter => fAfter(oState));
-
+            //console.log('CHANGED', this.constructor.name, this.aChanged);
             if (oEvent) { // Handler
                 this.setState(oState, fDone);
             } else {      // Virgin
                 this.state = oState;
                 fDone();
             }
+        } else {
+            //console.log('UNCHANGED', this.constructor.name);
+            fDone();
         }
     };
 
@@ -187,15 +190,15 @@ export default class BaobabComponent extends React.Component {
             this._oQueries[ sKey ].setState(oState);
         }
 
+        if (bKeyDataChanged && this._bAfter && this._oAfter.has(sKey)) { // We're not running onUpdate methods until after we've updated our state
+            this.aAfter.push(sKey);
+        }
+
         if (this._bPassive && this._oPassive.has(sKey)) {
             // Do Not Notify updates for This Key
         } else if (bKeyDataChanged) {
             this.bChanged = true;
-            // this.aChanged.push(sKey); // For Tracking and Debugging
-
-            if (this._bAfter && this._oAfter.has(sKey)) { // We're not running onUpdate methods until after we've updated our state
-                this.aAfter.push(this._oQueries[sKey].onUpdate);
-            }
+            this.aChanged.push(sKey); // For Tracking and Debugging
         }
     };
 

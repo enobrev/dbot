@@ -29,10 +29,15 @@ export default class Table extends BaobabComponent {
             },
             focus:         {
                 cursor:   [ 'state', 'www', 'focus' ],
-                setState: oState => {
-                    oState.stealFocus = oState.focus == 'table-' + oState.table.id;
-                }
+                setState: oState => oState.stealFocus = oState.focus == 'table-' + oState.type.id,
+                onUpdate: oState => oState.stealFocus && this.refs.input && this.refs.input.focus()
             }
+        }
+    }
+
+    componentDidMount() {
+        if (this.state.stealFocus) {
+            this.refs.name.focus();
         }
     }
 
@@ -116,20 +121,6 @@ export default class Table extends BaobabComponent {
                 </div>
             </form>
         )
-    }
-
-    stealFocus() {
-        if (this.state.stealFocus) {
-            this.refs.name.focus();
-        }
-    }
-
-    componentDidMount() {
-        this.stealFocus();
-    }
-
-    componentDidUpdate() {
-        this.stealFocus();
     }
 
     updateProperty = oEvent => {

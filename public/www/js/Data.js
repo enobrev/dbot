@@ -74,6 +74,14 @@ export default class Data {
         });
     }
 
+    static mergeResponseDirectly(oError, oResponse) {
+        if (oError) {
+            console.error(oError);
+        } else {
+            Data.mergeResponse(oResponse);
+        }
+    }
+
     static mergeResponse(oResponse) {
         if (!oResponse) {
             return;

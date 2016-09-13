@@ -2,8 +2,9 @@
 
 import React, { PropTypes } from "react";
 import ClassNames from 'classnames';
-import BaobabComponent from './BaobabComponent';
 import pluralize from 'pluralize';
+import BaobabComponent from './BaobabComponent';
+import Checkbox from './Checkbox';
 import LocalData from '../js/LocalData';
 
 export default class Column extends BaobabComponent {
@@ -33,10 +34,15 @@ export default class Column extends BaobabComponent {
             },
             focus:         {
                 cursor:   [ 'state', 'www', 'focus' ],
-                setState: oState => {
-                    oState.stealFocus = oState.focus == 'column-' + oState.column.id;
-                }
+                setState: oState => oState.stealFocus = oState.focus == 'column-' + oState.type.id,
+                onUpdate: oState => oState.stealFocus && this.refs.name_short && this.refs.name_short.focus()
             }
+        }
+    }
+
+    componentDidMount() {
+        if (this.state.stealFocus) {
+            this.refs.name_short.focus();
         }
     }
 
@@ -91,10 +97,6 @@ export default class Column extends BaobabComponent {
                     <div className="field">
                         <input ref="default"     name="default"    value={oColumn.default}    placeholder="Default"   onChange={this.updateProperty} />
                     </div>
-
-                    <div className="field">
-                        <input ref="null"        name="null"       value={oColumn.null}       placeholder="Nullable"  onChange={this.updateProperty} />
-                    </div>
                 </div>
             </form>
         );
@@ -128,24 +130,11 @@ export default class Column extends BaobabComponent {
                     {this.renderNameShort()}
                     {this.renderButtons()}
 
-                    <div className="field">
-                        <div ref="primary" className="ui checkbox">
-                            <input type="checkbox" tabIndex="0" className="hidden" checked={oColumn.primary == 1} />
-                            <label>Primary Key</label>
-                        </div>
-                    </div>
-                    <div className="field">
-                        <div ref="auto_increment" className="ui checkbox">
-                            <input type="checkbox" tabIndex="0" className="hidden" checked={oColumn.auto_increment == 1} />
-                            <label>Auto Increment</label>
-                        </div>
-                    </div>
-                    <div className="field">
-                        <div ref="unique" className="ui checkbox">
-                            <input type="checkbox" tabIndex="0" className="hidden" checked={oColumn.unique == 1} />
-                            <label>Unique Index</label>
-                        </div>
-                    </div>
+                    <Checkbox name="primary"        checked={oColumn.primary}        label="Primary Key"    onChange={this.checkedProperty} />
+                    <Checkbox name="auto_increment" checked={oColumn.auto_increment} label="Auto Increment" onChange={this.checkedProperty} />
+                    <Checkbox name="unique"         checked={oColumn.unique}         label="Unique"         onChange={this.checkedProperty} />
+                    <Checkbox name="nullable"       checked={oColumn.nullable}       label="Nullable"       onChange={this.checkedProperty} />
+
                 </div>
             </form>
         )
@@ -180,34 +169,8 @@ export default class Column extends BaobabComponent {
         )
     }
 
-    stealFocus() {
-        if (this.state.stealFocus) {
-            this.refs.name_short.focus();
-        }
-    }
-
-    prepCheckboxes() {
-        for (let sField of ['primary', 'auto_increment', 'unique']) {
-            $(this.refs[sField]).checkbox({
-                onChecked:   oEvent => this.checkedProperty(sField, true),
-                onUnchecked: oEvent => this.checkedProperty(sField, false),
-            });
-        }
-    }
-
-    componentDidMount() {
-        this.stealFocus();
-        this.prepCheckboxes();
-
-    }
-
-    componentDidUpdate() {
-        this.stealFocus();
-        this.prepCheckboxes();
-    }
-
     checkedProperty = (sProperty, bChecked) => {
-        this.CURSORS.column.merge({[sProperty]: bChecked ? 1 : 0});
+        this.CURSORS.column.merge({[sProperty]: bChecked});
     };
 
     updateProperty = oEvent => {

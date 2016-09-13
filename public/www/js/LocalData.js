@@ -29,4 +29,11 @@ export default class LocalData {
             name:       ''
         };
     }
+
+    static newColumnType() {
+        return {
+            id:         UUID(),
+            name:       ''
+        };
+    }
 }
