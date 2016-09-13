@@ -32,7 +32,9 @@ export default class Data {
             www: {
                 url_state: {},
                 component: null,
-                focus:     null
+                focus:     null,
+                table:     {},
+                column:    {}
             }
         },
         props: {}

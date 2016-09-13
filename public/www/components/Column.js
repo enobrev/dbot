@@ -1,6 +1,7 @@
 "use strict";
 
 import React, { PropTypes } from "react";
+import ClassNames from 'classnames';
 import BaobabComponent from './BaobabComponent';
 import pluralize from 'pluralize';
 import LocalData from '../js/LocalData';
@@ -15,6 +16,7 @@ export default class Column extends BaobabComponent {
     stateQueries() {
         return {
             column:        [ 'local', 'columns', this.props.id ],
+            show:          [ 'state', 'www', 'column', this.props.id, 'show' ],
             tables:        {
                 cursor:       [ 'local', 'tables' ],
                 invokeRender: false,
@@ -39,14 +41,125 @@ export default class Column extends BaobabComponent {
     }
 
     render() {
+        const { show: sShow } = this.state;
+
+        switch(sShow) {
+            default:
+            case 'DETAILS': return this.renderDetails(); break;
+            case 'INDICES': return this.renderIndices(); break;
+            case 'NAMES':   return this.renderNames();   break;
+        }
+    }
+
+    renderButtons() {
+        const { show: sShow } = this.state;
+
+        return (
+            <div className="ui field buttons">
+                <div className={ClassNames("ui button", {disabled: sShow == 'DETAILS' || !sShow})} onClick={this.openDetails}>D</div>
+                <div className={ClassNames("ui button", {disabled: sShow == 'INDICES'})} onClick={this.openIndices}>I</div>
+                <div className={ClassNames("ui button", {disabled: sShow == 'NAMES'})}   onClick={this.openNames}>N</div>
+            </div>
+        )
+    }
+
+    renderNameShort() {
         const { column: oColumn } = this.state;
 
         return (
-            <form className="ui form" onSubmit={oEvent => oEvent.preventDefault()}>
-                <div className="ui six fields">
+            <div className="field">
+                <input ref="name_short"  name="name_short"       value={oColumn.name_short}       placeholder="Short Name"       onChange={this.updateProperty} onKeyDown={this.onKeyDown} />
+            </div>
+        );
+    }
+
+    renderDetails() {
+        const { column: oColumn } = this.state;
+
+        return (
+            <form key="details" className="ui form" onSubmit={oEvent => oEvent.preventDefault()}>
+                <div className="ui seven fields">
+                    {this.renderNameShort()}
+                    {this.renderButtons()}
+
                     <div className="field">
-                        <input ref="name_short"        name="name_short"       value={oColumn.name_short}       placeholder="Short Name"       onChange={this.updateProperty} onKeyDown={this.onKeyDown} />
+                        <input ref="type"        name="type"       value={oColumn.type}       placeholder="Type"      onChange={this.updateProperty} />
                     </div>
+
+                    {this.renderLengthOrValues()}
+
+                    <div className="field">
+                        <input ref="default"     name="default"    value={oColumn.default}    placeholder="Default"   onChange={this.updateProperty} />
+                    </div>
+
+                    <div className="field">
+                        <input ref="null"        name="null"       value={oColumn.null}       placeholder="Nullable"  onChange={this.updateProperty} />
+                    </div>
+                </div>
+            </form>
+        );
+    }
+
+    renderLengthOrValues() {
+        const { column: oColumn } = this.state;
+
+        let bEnum = false;
+        if (bEnum) {
+            return (
+                <div className="field">
+                    <input ref="values"        name="values"       value={oColumn.values}       placeholder="Enum Values"       onChange={this.updateProperty} />
+                </div>
+            );
+        }
+
+        return (
+            <div className="field">
+                <input ref="length"        name="length"       value={oColumn.length}       placeholder="Length"       onChange={this.updateProperty} />
+            </div>
+        );
+    }
+
+    renderIndices() {
+        const { column: oColumn } = this.state;
+
+        return (
+            <form key="indices" className="ui form" onSubmit={oEvent => oEvent.preventDefault()}>
+                <div className="ui seven fields">
+                    {this.renderNameShort()}
+                    {this.renderButtons()}
+
+                    <div className="field">
+                        <div ref="primary" className="ui checkbox">
+                            <input type="checkbox" tabIndex="0" className="hidden" checked={oColumn.primary == 1} />
+                            <label>Primary Key</label>
+                        </div>
+                    </div>
+                    <div className="field">
+                        <div ref="auto_increment" className="ui checkbox">
+                            <input type="checkbox" tabIndex="0" className="hidden" checked={oColumn.auto_increment == 1} />
+                            <label>Auto Increment</label>
+                        </div>
+                    </div>
+                    <div className="field">
+                        <div ref="unique" className="ui checkbox">
+                            <input type="checkbox" tabIndex="0" className="hidden" checked={oColumn.unique == 1} />
+                            <label>Unique Index</label>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        )
+    }
+
+    renderNames() {
+        const { column: oColumn } = this.state;
+
+        return (
+            <form key="names" className="ui form" onSubmit={oEvent => oEvent.preventDefault()}>
+                <div className="ui seven fields">
+                    {this.renderNameShort()}
+                    {this.renderButtons()}
+
                     <div className="field">
                         <input ref="name"              name="name"             value={oColumn.name}             placeholder="Name"             onChange={this.updateProperty} />
                     </div>
@@ -73,13 +186,29 @@ export default class Column extends BaobabComponent {
         }
     }
 
+    prepCheckboxes() {
+        for (let sField of ['primary', 'auto_increment', 'unique']) {
+            $(this.refs[sField]).checkbox({
+                onChecked:   oEvent => this.checkedProperty(sField, true),
+                onUnchecked: oEvent => this.checkedProperty(sField, false),
+            });
+        }
+    }
+
     componentDidMount() {
         this.stealFocus();
+        this.prepCheckboxes();
+
     }
 
     componentDidUpdate() {
         this.stealFocus();
+        this.prepCheckboxes();
     }
+
+    checkedProperty = (sProperty, bChecked) => {
+        this.CURSORS.column.merge({[sProperty]: bChecked ? 1 : 0});
+    };
 
     updateProperty = oEvent => {
         if (oEvent.target.name == 'name_short') {
@@ -105,6 +234,18 @@ export default class Column extends BaobabComponent {
         } else {
             this.CURSORS.column.merge({[oEvent.target.name]: oEvent.target.value});
         }
+    };
+
+    openDetails = () => {
+        this.CURSORS.show.set('DETAILS');
+    };
+
+    openIndices = () => {
+        this.CURSORS.show.set('INDICES');
+    };
+
+    openNames = () => {
+        this.CURSORS.show.set('NAMES');
     };
 
     onKeyDown = oEvent => {

@@ -1,9 +1,11 @@
 "use strict";
 
 import React, { PropTypes } from "react";
-import BaobabComponent from './BaobabComponent';
 import pluralize from 'pluralize';
+
+import BaobabComponent from './BaobabComponent';
 import Column from './Column';
+
 import LocalData from '../js/LocalData';
 
 export default class Table extends BaobabComponent {
@@ -15,18 +17,18 @@ export default class Table extends BaobabComponent {
 
     stateQueries() {
         return {
-            table:  [ 'local', 'tables', this.props.id ],
-            name:   [ 'local', 'tables', this.props.id, 'name' ],
-            columns: {
-                cursor:    [ 'local', 'columns' ],
+            table:         [ 'local', 'tables', this.props.id ],
+            open:          [ 'state', 'www', 'table', this.props.id, 'open' ],
+            columns:       {
+                cursor:       [ 'local', 'columns' ],
                 invokeRender: true,
-                setState:  oState => oState.table_columns = Object.values(oState.columns).filter(oTable => oTable.table_id == this.props.id)
+                setState:     oState => oState.table_columns = Object.values(oState.columns).filter(oTable => oTable.table_id == this.props.id)
             },
             table_columns: {
                 setState: oState => oState.show = oState.table_columns.length > 0
             },
-            focus:   {
-                cursor: [ 'state', 'www', 'focus' ],
+            focus:         {
+                cursor:   [ 'state', 'www', 'focus' ],
                 setState: oState => {
                     oState.stealFocus = oState.focus == 'table-' + oState.table.id;
                 }
@@ -35,66 +37,84 @@ export default class Table extends BaobabComponent {
     }
 
     render() {
+        return (
+            <div className="ui segment">
+                {this.renderForm()}
+                {this.renderColumns()}
+            </div>
+        )
+    }
+
+    renderForm() {
+        const { open: bOpen } = this.state;
+
+        return bOpen
+            ? this.renderOpen()
+            : this.renderClosed();
+    }
+
+    renderColumns() {
         const {
-            table:         oTable,
             table_columns: aColumns,
             show:          bShow
         } = this.state;
 
+        if (!bShow) {
+            return null;
+        }
+
         return (
             <div className="ui segment">
-                <form className="ui form" onSubmit={oEvent => oEvent.preventDefault()}>
-                    <div className="ui seven fields">
-                        <div className="field">
-                            <input ref="name"             name="name"             value={oTable.name}             placeholder="Name"             onChange={this.updateProperty} onKeyDown={this.onKeyDown} />
-                        </div>
-                        <div className="field">
-                            <input ref="name_singular"    name="name_singular"    value={oTable.name_singular}    placeholder="Singular"         onChange={this.updateProperty} />
-                        </div>
-                        <div className="field">
-                            <input ref="name_plural"      name="name_plural"      value={oTable.name_plural}      placeholder="Plural"           onChange={this.updateProperty} />
-                        </div>
-                        <div className="field">
-                            <input ref="display_singular" name="display_singular" value={oTable.display_singular} placeholder="Singular Display" onChange={this.updateProperty} />
-                        </div>
-                        <div className="field">
-                            <input ref="display_plural"   name="display_plural"   value={oTable.display_plural}   placeholder="Plural Display"   onChange={this.updateProperty} />
-                        </div>
-                        <div className="field">
-                            <input ref="class_singular"   name="class_singular"   value={oTable.class_singular}   placeholder="Singular Class"   onChange={this.updateProperty} />
-                        </div>
-                        <div className="field">
-                            <input ref="class_plural"     name="class_plural"     value={oTable.class_plural}     placeholder="Plural Class"     onChange={this.updateProperty} />
-                        </div>
-                    </div>
-                </form>
-
-                <div className="ui basic segment" style={{display: bShow ? 'block' : 'none'}}>
-                    <form className="ui form" onSubmit={oEvent => oEvent.preventDefault()}>
-                        <div className="ui six fields">
-                            <div className="field">
-                                <label>Short Name</label>
-                            </div>
-                            <div className="field">
-                                <label>Name</label>
-                            </div>
-                            <div className="field">
-                                <label>Singular</label>
-                            </div>
-                            <div className="field">
-                                <label>Plural</label>
-                            </div>
-                            <div className="field">
-                                <label>Singular Display</label>
-                            </div>
-                            <div className="field">
-                                <label>Plural Display</label>
-                            </div>
-                        </div>
-                    </form>
-                    {aColumns.map(oTable => <Column key={oTable.id} id={oTable.id} />)}
-                </div>
+                {aColumns.map(oTable => <Column key={oTable.id} id={oTable.id} />)}
             </div>
+        );
+    }
+
+    renderClosed() {
+        const { table: oTable } = this.state;
+
+        return (
+            <form className="ui form" onSubmit={oEvent => oEvent.preventDefault()}>
+                <div className="ui seven fields">
+                    <div className="field">
+                        <input ref="name" name="name" value={oTable.name} placeholder="Name" onChange={this.updateProperty} onKeyDown={this.onKeyDown} />
+                    </div>
+                    <div className="ui icon button" onClick={this.toggleOpen}><i className="plus square outline icon" /></div>
+                </div>
+            </form>
+        );
+    }
+
+    renderOpen() {
+        const { table: oTable } = this.state;
+
+        return (
+            <form className="ui form" onSubmit={oEvent => oEvent.preventDefault()}>
+                <div className="ui seven fields">
+                    <div className="field">
+                        <input ref="name" name="name" value={oTable.name} placeholder="Name" onChange={this.updateProperty} onKeyDown={this.onKeyDown} />
+                    </div>
+                    <div className="ui icon button" onClick={this.toggleOpen}><i className="minus square outline icon" /></div>
+                    <div className="field">
+                        <input ref="name_singular"    name="name_singular"    value={oTable.name_singular}    placeholder="Singular"         onChange={this.updateProperty} />
+                    </div>
+                    <div className="field">
+                        <input ref="name_plural"      name="name_plural"      value={oTable.name_plural}      placeholder="Plural"           onChange={this.updateProperty} />
+                    </div>
+                    <div className="field">
+                        <input ref="display_singular" name="display_singular" value={oTable.display_singular} placeholder="Singular Display" onChange={this.updateProperty} />
+                    </div>
+                    <div className="field">
+                        <input ref="display_plural"   name="display_plural"   value={oTable.display_plural}   placeholder="Plural Display"   onChange={this.updateProperty} />
+                    </div>
+                    <div className="field">
+                        <input ref="class_singular"   name="class_singular"   value={oTable.class_singular}   placeholder="Singular Class"   onChange={this.updateProperty} />
+                    </div>
+                    <div className="field">
+                        <input ref="class_plural"     name="class_plural"     value={oTable.class_plural}     placeholder="Plural Class"     onChange={this.updateProperty} />
+                    </div>
+                </div>
+            </form>
         )
     }
 
@@ -131,12 +151,15 @@ export default class Table extends BaobabComponent {
         }
     };
 
+    toggleOpen = () => {
+        this.CURSORS.open.apply(bValue => !bValue);
+    };
+
     onKeyDown = oEvent => {
         const {
-            table_columns: aColumns,
-            table:         oTable,
-            name:          sName
-        } = this.state;
+                  table_columns: aColumns,
+                  table:         oTable
+              } = this.state;
 
         switch(oEvent.keyCode) {
             case 13: // ENTER
@@ -150,7 +173,7 @@ export default class Table extends BaobabComponent {
                 break;
 
             case 8: // BACKSPACE
-                if (sName.length == 0) {
+                if (!oTable.name || oTable.name.length == 0) {
                     this.CURSORS.table.unset();
 
                     console.log('TODO: Focus on Previous Table or Project');

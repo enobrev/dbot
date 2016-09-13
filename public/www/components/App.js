@@ -52,6 +52,8 @@ export default class App extends BaobabComponent {
                         </div>
                     </div>
                 ))}
+
+                <Types />
             </div>
         );
     }
