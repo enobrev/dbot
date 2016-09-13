@@ -63,21 +63,20 @@ export default class Type extends BaobabComponent {
             <form className="ui form" onSubmit={oEvent => oEvent.preventDefault()}>
                 <div className="ui six fields">
                     <div className="field">
-                        <input ref="name"   name="name"   value={oType.name}   placeholder="Name"   onChange={this.updateProperty} onKeyDown={this.onKeyDown} />
+                        <input ref="name"   name="name"   value={oType.name || ''}   placeholder="Name"   onChange={this.updateProperty} onKeyDown={this.onKeyDown} />
                     </div>
                     <div className="field">
-                        <input ref="php"    name="php"    value={oType.php}    placeholder="PHP"    onChange={this.updateProperty} onKeyDown={this.onKeyDown} />
+                        <input ref="php"    name="php"    value={oType.php || ''}    placeholder="PHP"    onChange={this.updateProperty} onKeyDown={this.onKeyDown} />
                     </div>
                     <div className="field">
-                        <input ref="mysql"  name="mysql"  value={oType.mysql}  placeholder="MySQL"  onChange={this.updateProperty} onKeyDown={this.onKeyDown} />
+                        <input ref="mysql"  name="mysql"  value={oType.mysql || ''}  placeholder="MySQL"  onChange={this.updateProperty} onKeyDown={this.onKeyDown} />
                     </div>
                     <div className="field">
-                        <input ref="length" name="length" value={oType.length} placeholder="Length" onChange={this.updateProperty} onKeyDown={this.onKeyDown} />
+                        <input ref="length" name="length" value={oType.length || ''} placeholder="Length" onChange={this.updateProperty} onKeyDown={this.onKeyDown} />
                     </div>
 
-                    <Checkbox name="unsigned"        checked={oType.unsigned}       label="Unsigned"       onChange={this.checkedProperty} />
-                    <Checkbox name="nullable"        checked={oType.nullable}       label="Nullable"       onChange={this.checkedProperty} />
-
+                    <Checkbox name="unsigned" checked={oType.unsigned} label="Unsigned" onChange={this.checkedProperty} />
+                    <Checkbox name="nullable" checked={oType.nullable} label="Nullable" onChange={this.checkedProperty} />
                 </div>
             </form>
         )

@@ -28,6 +28,10 @@ export default class App extends BaobabComponent {
             column_types: {
                 cursor:  [ 'local', 'column_types'],
                 setState: oState => oState.types = Data.sortObjectBy(oState.column_types, 'date_added')
+            },
+            focus:        {
+                cursor:   [ 'state', 'www', 'focus' ],
+                invokeRender: false,
             }
         }
     }
@@ -74,7 +78,7 @@ export default class App extends BaobabComponent {
         return (
             <div className="ui bottom attached segment">
                 {aProjects.map(oProject => (
-                    <Project id={oProject.id} />
+                    <Project key={oProject.id} id={oProject.id} />
                 ))}
             </div>
         );

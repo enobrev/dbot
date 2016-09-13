@@ -71,19 +71,12 @@ export default class Column extends BaobabComponent {
         }
     };
 
-    initDropdowns() {
-        $(this.refs.type).dropdown({onChange: this.updateType.bind(this)});
-        $(this.refs.defaultDropdown).dropdown({onChange: this.updateDefault.bind(this)});
-    }
-
     componentDidMount() {
         this.stealFocus(this.state);
-        this.initDropdowns();
     }
 
     componentDidUpdate() {
         this.stealFocus(this.state);
-        this.initDropdowns();
     }
 
     render() {
@@ -101,7 +94,7 @@ export default class Column extends BaobabComponent {
 
         return (
             <div className="three wide field">
-                <input ref="name_short"  name="name_short"       value={oColumn.name_short}       placeholder="Short Name"       onChange={this.updateProperty} onKeyDown={this.onKeyDown} />
+                <input ref="name_short"  name="name_short" value={oColumn.name_short || ''} placeholder="Short Name" onChange={this.updateProperty} onKeyDown={this.onKeyDown} />
             </div>
         );
     }
@@ -115,7 +108,7 @@ export default class Column extends BaobabComponent {
                     {this.renderNameShort()}
 
                     <div className="field">
-                        <select ref="type" name="type" className="ui fluid search dropdown" value={oColumn.type_id}>
+                        <select ref="type" name="type" value={oColumn.type_id} onChange={this.updateProperty}>
                             <option value={null}>Type</option>
                             {aTypes.map(oType => <option key={oType.id} value={oType.id}>{oType.name}</option>)}
                         </select>
@@ -126,7 +119,8 @@ export default class Column extends BaobabComponent {
 
                     <Checkbox name="nullable"       checked={oColumn.nullable}       label="Nullable"   onChange={this.checkedProperty} />
                     <Checkbox name="primary"        checked={oColumn.primary}        label="Primary"    onChange={this.checkedProperty} />
-                    { oColumn.primary && <Checkbox name="auto_increment" checked={oColumn.auto_increment} label="AutoInc"    onChange={this.checkedProperty} />}
+                    { (oColumn.type_id == oTypeId.id || oColumn.type_id == oTypeInt.id) && oColumn.primary
+                        && <Checkbox name="auto_increment" checked={oColumn.auto_increment} label="AutoInc"    onChange={this.checkedProperty} />}
                     { (oColumn.type_id == oTypeId.id || oColumn.type_id == oTypeInt.id)
                         && <Checkbox name="unsigned"       checked={oColumn.unsigned}       label="Unsigned"   onChange={this.checkedProperty} />}
                 </div>
@@ -140,14 +134,14 @@ export default class Column extends BaobabComponent {
         if (oColumn.type_id == oTypeEnum.id) {
             return (
                 <div className="field">
-                    <input ref="values" name="values" value={oColumn.values} placeholder="Enum Values" onChange={this.updateProperty} />
+                    <input ref="values" name="values" value={oColumn.values || ''} placeholder="Enum Values" onChange={this.updateProperty} />
                 </div>
             );
         }
 
         return (
             <div className="field">
-                <input ref="length"    name="length"  value={oColumn.length} placeholder="Length"       onChange={this.updateProperty} />
+                <input ref="length"    name="length"  value={oColumn.length || ''} placeholder="Length"       onChange={this.updateProperty} />
             </div>
         );
     }
@@ -164,7 +158,7 @@ export default class Column extends BaobabComponent {
 
             return (
                 <div className="field">
-                    <select ref="defaultDropdown" name="default" className="ui fluid search dropdown" value={oColumn.default}>
+                    <select ref="defaultDropdown" name="default" value={oColumn.default} onChange={this.updateProperty}>
                         {aValues.map((sValue, iIndex) => <option key={iIndex} value={sValue}>{sValue}</option>)}
                     </select>
                 </div>
@@ -173,7 +167,7 @@ export default class Column extends BaobabComponent {
 
         return (
             <div className="field">
-                <input ref="default"     name="default"    value={oColumn.default}    placeholder="Default"   onChange={this.updateProperty} />
+                <input ref="default" name="default" value={oColumn.default || ''} placeholder="Default" onChange={this.updateProperty} />
             </div>
         );
     }
@@ -187,19 +181,19 @@ export default class Column extends BaobabComponent {
                     {this.renderNameShort()}
 
                     <div className="field">
-                        <input ref="name"              name="name"             value={oColumn.name}             placeholder="Name"             onChange={this.updateProperty} />
+                        <input ref="name"              name="name"             value={oColumn.name || ''}             placeholder="Name"             onChange={this.updateProperty} />
                     </div>
                     <div className="field">
-                        <input ref="name_singular"     name="name_singular"    value={oColumn.name_singular}    placeholder="Singular"         onChange={this.updateProperty} />
+                        <input ref="name_singular"     name="name_singular"    value={oColumn.name_singular || ''}    placeholder="Singular"         onChange={this.updateProperty} />
                     </div>
                     <div className="field">
-                        <input ref="name_plural"       name="name_plural"      value={oColumn.name_plural}      placeholder="Plural"           onChange={this.updateProperty} />
+                        <input ref="name_plural"       name="name_plural"      value={oColumn.name_plural || ''}      placeholder="Plural"           onChange={this.updateProperty} />
                     </div>
                     <div className="field">
-                        <input ref="display_singular"  name="display_singular" value={oColumn.display_singular} placeholder="Singular Display" onChange={this.updateProperty} />
+                        <input ref="display_singular"  name="display_singular" value={oColumn.display_singular || ''} placeholder="Singular Display" onChange={this.updateProperty} />
                     </div>
                     <div className="field">
-                        <input ref="display_plural"    name="display_plural"   value={oColumn.display_plural}   placeholder="Plural Display"   onChange={this.updateProperty} />
+                        <input ref="display_plural"    name="display_plural"   value={oColumn.display_plural || ''}   placeholder="Plural Display"   onChange={this.updateProperty} />
                     </div>
                 </div>
             </form>
@@ -243,7 +237,7 @@ export default class Column extends BaobabComponent {
                     if (oTypeDateTime.nullable) {
                         oMerge.nullable = oTypeDateTime.nullable;
                     }
-                } else if (oMerge.name_short.match(/_id$/)) {
+                } else if (oMerge.name_short.match(/id$/)) {
                     oMerge.type_id = oTypeId.id;
 
                     if (oTypeId.unsigned) {

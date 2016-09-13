@@ -23,7 +23,7 @@ export default class Checkbox extends React.Component {
         return (
             <div className="field">
                 <div ref="checkbox" className="ui checkbox">
-                    <input type="checkbox" tabIndex="0" className="hidden" checked={bChecked} />
+                    <input type="checkbox" tabIndex="0" className="hidden" checked={bChecked} onChange={() => {}} />
                     <label>{sLabel}</label>
                 </div>
             </div>
