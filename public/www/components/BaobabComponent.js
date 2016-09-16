@@ -1,5 +1,6 @@
 "use strict";
 
+import async from 'async'
 import React, {PropTypes} from "react";
 import Data from '../js/Data';
 import shallowCompare from 'react-addons-shallow-compare'
@@ -293,25 +294,29 @@ export default class BaobabComponent extends React.Component {
  */
 
 function solveUpdate(affectedPaths, comparedPaths) {
-    let i, j, k, l, m, n, p, c, s;
+    let l = affectedPaths.length;
 
     // Looping through possible paths
-    for (i = 0, l = affectedPaths.length; i < l; i++) {
-        p = affectedPaths[i];
+    for (let i = 0; i < l; i++) {
+        let p = affectedPaths[i];
 
         if (!p.length)
             return p;
 
+        let m = comparedPaths.length;
+
         // Looping through logged paths
-        for (j = 0, m = comparedPaths.length; j < m; j++) {
-            c = comparedPaths[j];
+        for (let j = 0; j < m; j++) {
+            let c = comparedPaths[j];
 
             if (!c || !c.length)
                 return p;
 
+            let n = c.length;
+
             // Looping through steps
-            for (k = 0, n = c.length; k < n; k++) {
-                s = c[k];
+            for (let k = 0; k < n; k++) {
+                let s = c[k];
 
                 // If path is not relevant, we break
                 // NOTE: the '!=' instead of '!==' is required here!
